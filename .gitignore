@@ -1,0 +1,6 @@
+*.lulu
+*.sh
+*.xml
+*.mnf
+nbproject/
+test/
