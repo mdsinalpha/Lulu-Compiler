@@ -3,7 +3,7 @@ grammar Lulu;
 //Rules:
 program:        ft_dcl? ft_def+;
 ft_dcl:         'declare' '{' (func_dcl | type_dcl | var_def)+ '}';
-func_dcl:       ('(' args ')' '=')? ID '('(args | args_var)? ')' ';';
+func_dcl:       ('(' args ')' '=')? ('native')? ID '('(args | args_var)? ')' ';';
 args:           type ('['']')* |
                 args ',' type ('['']')*;
 args_var:       type ('['']')* ID |
@@ -11,43 +11,43 @@ args_var:       type ('['']')* ID |
 type_dcl:       ID ';';
 var_def:        ('const')? type var_val (','var_val)* ';';
 var_val:        ref ('='expr)?;
-ft_def:         type_def | func_def;
+ft_def:         type_def #TYPE | func_def #FUNC;
 type_def:       'type' ID(':' ID)? '{' component+ '}';
 component:      ACCSSMOD? (var_def | func_def);
 func_def:       ('(' args_var ')' '=')? 'function' ID '(' args_var? ')' block;
 block:          '{' (var_def | stmt)* '}';
-stmt:           assign ';' |
-                func_call ';' |
-                cond_stmt |
-                loop_stmt |
-                'return' ';'| 'break' ';' | 'continue' ';' | 'destruct'('['']')* ID ';';
+stmt:           assign ';' #ASSIGN |
+                func_call ';' #FUNCTIONC |
+                cond_stmt #CONDITION |
+                loop_stmt #LOOP |
+                'return' ';' #RETURN | 'break' ';' #BREAK | 'continue' ';' #CONTINUE | 'destruct'('['']')* ID ';' #DESTRUCTION;
 assign:         (<assoc=right> (var | '(' var (',' var)* ')') '=' expr);
 var:            (('this' | 'super')'.')? ref ('.' ref)*;
 ref:            ID ('[' expr ']')*;
-expr:           '(' expr ')' |
-                UNARY_OP expr | MINUS expr |
-                expr ARIT_P1 expr |
-                expr ARIT_P2 expr | expr MINUS expr |
-                expr BITWISE_AND expr |
-                expr BITWISE_XOR expr |
-                expr BITWISE_OR expr |
-                expr REL expr |
-                expr REL_EQ expr |
-                expr LOGICAL_AND expr |
-                expr LOGICAL_OR expr |
-                'allocate' handle_call |
-                func_call | var | list | 'nil' | const_val;
-func_call:      (var'.')? handle_call |
-                'read' '(' var ')' | 'write' '(' var ')';
+expr:           '(' expr ')' #PARENTHESES|
+                UNARY_OP expr #UNARY_OP | MINUS expr #MINUS |
+                expr ARIT_P1 expr #ARIT_P1 |
+                expr ARIT_P2 expr #ARIT_P2 | expr MINUS expr #MINUS |
+                expr BITWISE_AND expr #BITWISE_AND |
+                expr BITWISE_XOR expr #BITWISE_XOR |
+                expr BITWISE_OR expr #BITWISE_OR |
+                expr REL expr #REL |
+                expr REL_EQ expr #REL_EQ |
+                expr LOGICAL_AND expr #LOGICAL_AND |
+                expr LOGICAL_OR expr #LOGICAL_OR |
+                'allocate' handle_call #ALLOCATION |
+                func_call #FUNCTION | var #VAR | list #LIST | 'nil' #NIL | const_val #CONST;
+func_call:      (var'.')? handle_call #HANDLE |
+                'read' '(' var ')' #READ | 'write' '(' var ')' #WRITE;
 list:           '[' (expr|list) ( ',' (expr | list))* ']';
 handle_call:    ID '(' params? ')';
 params:         expr | expr ',' params;
-cond_stmt:      'if' expr block ('else' block)? |
-                'switch' var '{' ('case' INT_CONST ':' block)* 'default' ':' block '}';
-loop_stmt:      'for' ( type? assign)? ';' expr ';' assign? block |
-                'while' expr block;
-const_val:      INT_CONST | REAL_CONST | BOOL_CONST | STRING_CONST;
-type:           PRIM_TYPE | ID;
+cond_stmt:      'if' expr block ('else' block)? #IF |
+                'switch' var '{' ('case' INT_CONST ':' block)* 'default' ':' block '}' #CASE;
+loop_stmt:      'for' ( type? assign)? ';' expr ';' assign? block #FOR |
+                'while' expr block #WHILE;
+const_val:      INT_CONST #INT | REAL_CONST #REAL | BOOL_CONST #BOOL | STRING_CONST #STRING;
+type:           PRIM_TYPE #PRIM | ID #ID;
 
 //Tokens:
 BOOL_CONST:     'true' | 'false';

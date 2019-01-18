@@ -22,7 +22,7 @@ public class LuluRun {
             ParseTreeWalker walker = new ParseTreeWalker();
             LuluSemanticAnalyzer loader = new LuluSemanticAnalyzer();
             walker.walk(loader, parser.program());
-            System.out.println(loader.test);
+            
         }catch(Exception e){
             e.printStackTrace();
         }
