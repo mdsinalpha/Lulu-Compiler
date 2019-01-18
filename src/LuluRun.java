@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileWriter;
 import java.util.Scanner;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -22,8 +23,15 @@ public class LuluRun {
             ParseTreeWalker walker = new ParseTreeWalker();
             LuluSemanticAnalyzer loader = new LuluSemanticAnalyzer();
             walker.walk(loader, parser.program());
-            
+            LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
+            File output = new File(args[1]);
+            FileWriter writer = new FileWriter(output);
+            while(generator.hasNextLine())
+                writer.write(generator.nextLine()+"\n");
+            writer.flush();
+            writer.close();
         }catch(Exception e){
+            //TODO Make log file
             e.printStackTrace();
         }
         
