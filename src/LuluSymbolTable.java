@@ -24,6 +24,17 @@ public class LuluSymbolTable {
    public LuluSymbolTable(){
        table = new HashMap<>();
    }
-    
+   
+   public boolean has(String id){
+       return table.containsKey(id);
+   }
+   
+   public Pair<Integer, Integer> get(String id){
+       return table.get(id);
+   }
+   
+   public void put(String id, Integer type, Integer offset){
+       table.put(id, new Pair<>(type, offset));
+   }
     
 }
