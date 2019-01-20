@@ -12,14 +12,15 @@ type mytype {
             y = 23.5;
         }
         else{
-            y = 15.2;
+            y = 2 * 3 / 4;
         }
         return;
     }
 }
 
 (int r) = function start() {
-    const float c = 0.23;
+    const float c = 3 * 4;
+    int ss = 3 * 8 * 6;
     int s;
     read(s);
     float w;
