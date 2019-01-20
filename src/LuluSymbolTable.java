@@ -19,7 +19,7 @@ public class LuluSymbolTable{
        }
    }
    
-   private final Map<String, Pair<Integer, Integer> > table;
+   private final Map<String, Pair<Integer, Object> > table;
    
    public LuluSymbolTable(){
        table = new HashMap<>();
@@ -29,7 +29,7 @@ public class LuluSymbolTable{
        return table.containsKey(id);
    }
    
-   public Pair<Integer, Integer> get(String id){
+   public Pair<Integer, Object> get(String id){
        return table.get(id);
    }
    
