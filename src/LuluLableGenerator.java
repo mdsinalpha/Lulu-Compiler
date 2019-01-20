@@ -15,6 +15,6 @@ public class LuluLableGenerator {
     
     public String getNextLable(){
         counter = (counter + 1) % 1000000007;
-        return String.format("%s%d%d", starter, System.currentTimeMillis()%100000, counter);
+        return String.format("%s%d%d", starter, System.currentTimeMillis()%10000, counter);
     }
 }
