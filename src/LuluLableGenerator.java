@@ -12,6 +12,6 @@ public class LuluLableGenerator {
     }
     
     public String getNextLable(){
-        return String.format("%s%f", starter, System.currentTimeMillis());
+        return String.format("%s%d", starter, System.currentTimeMillis());
     }
 }
