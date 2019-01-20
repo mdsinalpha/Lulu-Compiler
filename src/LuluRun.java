@@ -13,6 +13,8 @@ public class LuluRun {
     
     public static void main(String[] args){
         
+        System.out.println(13.5%2.5);
+        
         try{
             File input = new File(args[0]);
             StringBuilder program = new StringBuilder();
