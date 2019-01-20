@@ -25,7 +25,7 @@ assign:         (<assoc=right> (var | '(' var (',' var)* ')') '=' expr);
 var:            (('this' | 'super')'.')? ref ('.' ref)*;
 ref:            ID ('[' expr ']')*;
 expr:           '(' expr ')' #PARENTHESES|
-                UNARY_OP expr #UNARY_OP | MINUS expr #MINUS |
+                UNARY_OP expr #UNARY_OP | MINUS expr #MINUS | BITWISE_NOT expr #BITWISE_NOT |
                 expr ARIT_P1 expr #ARIT_P1 |
                 expr ARIT_P2 expr #ARIT_P2 | expr MINUS expr #MINUS |
                 expr BITWISE_AND expr #BITWISE_AND |
@@ -54,10 +54,11 @@ BOOL_CONST:     'true' | 'false';
 PRIM_TYPE:      'int' | 'bool' | 'float' | 'string';
 ACCSSMOD:       'private' | 'public' | 'protected';
 ID:             LETTER (LETTER | DIGIT) * ;
-UNARY_OP:       '!' | '~';
+UNARY_OP:       '!';
 MINUS:          '-';
 ARIT_P1:        '*' | '/' | '%';
 ARIT_P2:        '+';
+BITWISE_NOT:    '~';
 BITWISE_AND:    '&';
 BITWISE_OR:     '|';
 BITWISE_XOR:    '^';

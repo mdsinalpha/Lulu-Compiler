@@ -1,4 +1,4 @@
-// Generated from Lulu.g4 by ANTLR 4.7.1
+// Generated from /home/mdsinalpha/Lulu/src/Lulu.g4 by ANTLR 4.7.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -118,14 +118,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_program; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterProgram(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitProgram(this);
-		}
 	}
 
 	public final ProgramContext program() throws RecognitionException {
@@ -195,14 +187,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_ft_dcl; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterFt_dcl(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitFt_dcl(this);
-		}
 	}
 
 	public final Ft_dclContext ft_dcl() throws RecognitionException {
@@ -278,14 +262,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_func_dcl; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterFunc_dcl(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitFunc_dcl(this);
-		}
 	}
 
 	public final Func_dclContext func_dcl() throws RecognitionException {
@@ -369,14 +345,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_args; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterArgs(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitArgs(this);
-		}
 	}
 
 	public final ArgsContext args() throws RecognitionException {
@@ -484,14 +452,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_args_var; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterArgs_var(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitArgs_var(this);
-		}
 	}
 
 	public final Args_varContext args_var() throws RecognitionException {
@@ -594,14 +554,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_type_dcl; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterType_dcl(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitType_dcl(this);
-		}
 	}
 
 	public final Type_dclContext type_dcl() throws RecognitionException {
@@ -641,14 +593,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_var_def; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterVar_def(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitVar_def(this);
-		}
 	}
 
 	public final Var_defContext var_def() throws RecognitionException {
@@ -714,14 +658,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_var_val; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterVar_val(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitVar_val(this);
-		}
 	}
 
 	public final Var_valContext var_val() throws RecognitionException {
@@ -774,28 +710,12 @@ public class LuluParser extends Parser {
 			return getRuleContext(Func_defContext.class,0);
 		}
 		public FUNCContext(Ft_defContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterFUNC(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitFUNC(this);
-		}
 	}
 	public static class TYPEContext extends Ft_defContext {
 		public Type_defContext type_def() {
 			return getRuleContext(Type_defContext.class,0);
 		}
 		public TYPEContext(Ft_defContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterTYPE(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitTYPE(this);
-		}
 	}
 
 	public final Ft_defContext ft_def() throws RecognitionException {
@@ -852,14 +772,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_type_def; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterType_def(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitType_def(this);
-		}
 	}
 
 	public final Type_defContext type_def() throws RecognitionException {
@@ -928,14 +840,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_component; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterComponent(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitComponent(this);
-		}
 	}
 
 	public final ComponentContext component() throws RecognitionException {
@@ -1004,14 +908,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_func_def; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterFunc_def(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitFunc_def(this);
-		}
 	}
 
 	public final Func_defContext func_def() throws RecognitionException {
@@ -1087,14 +983,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_block; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterBlock(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitBlock(this);
-		}
 	}
 
 	public final BlockContext block() throws RecognitionException {
@@ -1160,104 +1048,40 @@ public class LuluParser extends Parser {
 	}
 	public static class CONTINUEContext extends StmtContext {
 		public CONTINUEContext(StmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterCONTINUE(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitCONTINUE(this);
-		}
 	}
 	public static class RETURNContext extends StmtContext {
 		public RETURNContext(StmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterRETURN(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitRETURN(this);
-		}
 	}
 	public static class DESTRUCTIONContext extends StmtContext {
 		public TerminalNode ID() { return getToken(LuluParser.ID, 0); }
 		public DESTRUCTIONContext(StmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterDESTRUCTION(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitDESTRUCTION(this);
-		}
 	}
 	public static class LOOPContext extends StmtContext {
 		public Loop_stmtContext loop_stmt() {
 			return getRuleContext(Loop_stmtContext.class,0);
 		}
 		public LOOPContext(StmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterLOOP(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitLOOP(this);
-		}
 	}
 	public static class BREAKContext extends StmtContext {
 		public BREAKContext(StmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterBREAK(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitBREAK(this);
-		}
 	}
 	public static class CONDITIONContext extends StmtContext {
 		public Cond_stmtContext cond_stmt() {
 			return getRuleContext(Cond_stmtContext.class,0);
 		}
 		public CONDITIONContext(StmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterCONDITION(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitCONDITION(this);
-		}
 	}
 	public static class ASSIGNContext extends StmtContext {
 		public AssignContext assign() {
 			return getRuleContext(AssignContext.class,0);
 		}
 		public ASSIGNContext(StmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterASSIGN(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitASSIGN(this);
-		}
 	}
 	public static class FUNCTIONCContext extends StmtContext {
 		public Func_callContext func_call() {
 			return getRuleContext(Func_callContext.class,0);
 		}
 		public FUNCTIONCContext(StmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterFUNCTIONC(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitFUNCTIONC(this);
-		}
 	}
 
 	public final StmtContext stmt() throws RecognitionException {
@@ -1389,14 +1213,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_assign; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterAssign(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitAssign(this);
-		}
 	}
 
 	public final AssignContext assign() throws RecognitionException {
@@ -1476,14 +1292,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_var; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterVar(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitVar(this);
-		}
 	}
 
 	public final VarContext var() throws RecognitionException {
@@ -1559,14 +1367,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_ref; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterRef(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitRef(this);
-		}
 	}
 
 	public final RefContext ref() throws RecognitionException {
@@ -1628,28 +1428,12 @@ public class LuluParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public BITWISE_NOTContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterBITWISE_NOT(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitBITWISE_NOT(this);
-		}
 	}
 	public static class VARContext extends ExprContext {
 		public VarContext var() {
 			return getRuleContext(VarContext.class,0);
 		}
 		public VARContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterVAR(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitVAR(this);
-		}
 	}
 	public static class BITWISE_ORContext extends ExprContext {
 		public List<ExprContext> expr() {
@@ -1660,14 +1444,6 @@ public class LuluParser extends Parser {
 		}
 		public TerminalNode BITWISE_OR() { return getToken(LuluParser.BITWISE_OR, 0); }
 		public BITWISE_ORContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterBITWISE_OR(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitBITWISE_OR(this);
-		}
 	}
 	public static class LOGICAL_ANDContext extends ExprContext {
 		public List<ExprContext> expr() {
@@ -1678,14 +1454,6 @@ public class LuluParser extends Parser {
 		}
 		public TerminalNode LOGICAL_AND() { return getToken(LuluParser.LOGICAL_AND, 0); }
 		public LOGICAL_ANDContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterLOGICAL_AND(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitLOGICAL_AND(this);
-		}
 	}
 	public static class ARIT_P1Context extends ExprContext {
 		public List<ExprContext> expr() {
@@ -1696,14 +1464,6 @@ public class LuluParser extends Parser {
 		}
 		public TerminalNode ARIT_P1() { return getToken(LuluParser.ARIT_P1, 0); }
 		public ARIT_P1Context(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterARIT_P1(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitARIT_P1(this);
-		}
 	}
 	public static class BITWISE_ANDContext extends ExprContext {
 		public List<ExprContext> expr() {
@@ -1714,14 +1474,6 @@ public class LuluParser extends Parser {
 		}
 		public TerminalNode BITWISE_AND() { return getToken(LuluParser.BITWISE_AND, 0); }
 		public BITWISE_ANDContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterBITWISE_AND(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitBITWISE_AND(this);
-		}
 	}
 	public static class ARIT_P2Context extends ExprContext {
 		public List<ExprContext> expr() {
@@ -1732,14 +1484,6 @@ public class LuluParser extends Parser {
 		}
 		public TerminalNode ARIT_P2() { return getToken(LuluParser.ARIT_P2, 0); }
 		public ARIT_P2Context(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterARIT_P2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitARIT_P2(this);
-		}
 	}
 	public static class LOGICAL_ORContext extends ExprContext {
 		public List<ExprContext> expr() {
@@ -1750,42 +1494,18 @@ public class LuluParser extends Parser {
 		}
 		public TerminalNode LOGICAL_OR() { return getToken(LuluParser.LOGICAL_OR, 0); }
 		public LOGICAL_ORContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterLOGICAL_OR(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitLOGICAL_OR(this);
-		}
 	}
 	public static class ALLOCATIONContext extends ExprContext {
 		public Handle_callContext handle_call() {
 			return getRuleContext(Handle_callContext.class,0);
 		}
 		public ALLOCATIONContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterALLOCATION(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitALLOCATION(this);
-		}
 	}
 	public static class FUNCTIONContext extends ExprContext {
 		public Func_callContext func_call() {
 			return getRuleContext(Func_callContext.class,0);
 		}
 		public FUNCTIONContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterFUNCTION(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitFUNCTION(this);
-		}
 	}
 	public static class BITWISE_XORContext extends ExprContext {
 		public List<ExprContext> expr() {
@@ -1796,14 +1516,6 @@ public class LuluParser extends Parser {
 		}
 		public TerminalNode BITWISE_XOR() { return getToken(LuluParser.BITWISE_XOR, 0); }
 		public BITWISE_XORContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterBITWISE_XOR(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitBITWISE_XOR(this);
-		}
 	}
 	public static class MINUSContext extends ExprContext {
 		public TerminalNode MINUS() { return getToken(LuluParser.MINUS, 0); }
@@ -1814,14 +1526,6 @@ public class LuluParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public MINUSContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterMINUS(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitMINUS(this);
-		}
 	}
 	public static class REL_EQContext extends ExprContext {
 		public List<ExprContext> expr() {
@@ -1832,25 +1536,9 @@ public class LuluParser extends Parser {
 		}
 		public TerminalNode REL_EQ() { return getToken(LuluParser.REL_EQ, 0); }
 		public REL_EQContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterREL_EQ(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitREL_EQ(this);
-		}
 	}
 	public static class NILContext extends ExprContext {
 		public NILContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterNIL(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitNIL(this);
-		}
 	}
 	public static class UNARY_OPContext extends ExprContext {
 		public TerminalNode UNARY_OP() { return getToken(LuluParser.UNARY_OP, 0); }
@@ -1858,42 +1546,18 @@ public class LuluParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public UNARY_OPContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterUNARY_OP(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitUNARY_OP(this);
-		}
 	}
 	public static class PARENTHESESContext extends ExprContext {
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public PARENTHESESContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterPARENTHESES(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitPARENTHESES(this);
-		}
 	}
 	public static class CONSTContext extends ExprContext {
 		public Const_valContext const_val() {
 			return getRuleContext(Const_valContext.class,0);
 		}
 		public CONSTContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterCONST(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitCONST(this);
-		}
 	}
 	public static class RELContext extends ExprContext {
 		public List<ExprContext> expr() {
@@ -1904,28 +1568,12 @@ public class LuluParser extends Parser {
 		}
 		public TerminalNode REL() { return getToken(LuluParser.REL, 0); }
 		public RELContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterREL(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitREL(this);
-		}
 	}
 	public static class LISTContext extends ExprContext {
 		public ListContext list() {
 			return getRuleContext(ListContext.class,0);
 		}
 		public LISTContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterLIST(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitLIST(this);
-		}
 	}
 
 	public final ExprContext expr() throws RecognitionException {
@@ -2218,14 +1866,6 @@ public class LuluParser extends Parser {
 			return getRuleContext(VarContext.class,0);
 		}
 		public READContext(Func_callContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterREAD(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitREAD(this);
-		}
 	}
 	public static class HANDLEContext extends Func_callContext {
 		public Handle_callContext handle_call() {
@@ -2235,28 +1875,12 @@ public class LuluParser extends Parser {
 			return getRuleContext(VarContext.class,0);
 		}
 		public HANDLEContext(Func_callContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterHANDLE(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitHANDLE(this);
-		}
 	}
 	public static class WRITEContext extends Func_callContext {
 		public VarContext var() {
 			return getRuleContext(VarContext.class,0);
 		}
 		public WRITEContext(Func_callContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterWRITE(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitWRITE(this);
-		}
 	}
 
 	public final Func_callContext func_call() throws RecognitionException {
@@ -2348,14 +1972,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_list; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterList(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitList(this);
-		}
 	}
 
 	public final ListContext list() throws RecognitionException {
@@ -2437,14 +2053,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_handle_call; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterHandle_call(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitHandle_call(this);
-		}
 	}
 
 	public final Handle_callContext handle_call() throws RecognitionException {
@@ -2494,14 +2102,6 @@ public class LuluParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_params; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterParams(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitParams(this);
-		}
 	}
 
 	public final ParamsContext params() throws RecognitionException {
@@ -2564,14 +2164,6 @@ public class LuluParser extends Parser {
 			return getRuleContext(BlockContext.class,i);
 		}
 		public IFContext(Cond_stmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterIF(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitIF(this);
-		}
 	}
 	public static class CASEContext extends Cond_stmtContext {
 		public VarContext var() {
@@ -2588,14 +2180,6 @@ public class LuluParser extends Parser {
 			return getToken(LuluParser.INT_CONST, i);
 		}
 		public CASEContext(Cond_stmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterCASE(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitCASE(this);
-		}
 	}
 
 	public final Cond_stmtContext cond_stmt() throws RecognitionException {
@@ -2713,14 +2297,6 @@ public class LuluParser extends Parser {
 			return getRuleContext(TypeContext.class,0);
 		}
 		public FORContext(Loop_stmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterFOR(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitFOR(this);
-		}
 	}
 	public static class WHILEContext extends Loop_stmtContext {
 		public ExprContext expr() {
@@ -2730,14 +2306,6 @@ public class LuluParser extends Parser {
 			return getRuleContext(BlockContext.class,0);
 		}
 		public WHILEContext(Loop_stmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterWHILE(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitWHILE(this);
-		}
 	}
 
 	public final Loop_stmtContext loop_stmt() throws RecognitionException {
@@ -2835,50 +2403,18 @@ public class LuluParser extends Parser {
 	public static class BOOLContext extends Const_valContext {
 		public TerminalNode BOOL_CONST() { return getToken(LuluParser.BOOL_CONST, 0); }
 		public BOOLContext(Const_valContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterBOOL(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitBOOL(this);
-		}
 	}
 	public static class REALContext extends Const_valContext {
 		public TerminalNode REAL_CONST() { return getToken(LuluParser.REAL_CONST, 0); }
 		public REALContext(Const_valContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterREAL(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitREAL(this);
-		}
 	}
 	public static class STRINGContext extends Const_valContext {
 		public TerminalNode STRING_CONST() { return getToken(LuluParser.STRING_CONST, 0); }
 		public STRINGContext(Const_valContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterSTRING(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitSTRING(this);
-		}
 	}
 	public static class INTContext extends Const_valContext {
 		public TerminalNode INT_CONST() { return getToken(LuluParser.INT_CONST, 0); }
 		public INTContext(Const_valContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterINT(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitINT(this);
-		}
 	}
 
 	public final Const_valContext const_val() throws RecognitionException {
@@ -2949,26 +2485,10 @@ public class LuluParser extends Parser {
 	public static class PRIMContext extends TypeContext {
 		public TerminalNode PRIM_TYPE() { return getToken(LuluParser.PRIM_TYPE, 0); }
 		public PRIMContext(TypeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterPRIM(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitPRIM(this);
-		}
 	}
 	public static class IDContext extends TypeContext {
 		public TerminalNode ID() { return getToken(LuluParser.ID, 0); }
 		public IDContext(TypeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterID(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitID(this);
-		}
 	}
 
 	public final TypeContext type() throws RecognitionException {

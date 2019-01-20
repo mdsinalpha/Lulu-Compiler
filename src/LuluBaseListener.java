@@ -315,6 +315,18 @@ public class LuluBaseListener implements LuluListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterBITWISE_NOT(LuluParser.BITWISE_NOTContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBITWISE_NOT(LuluParser.BITWISE_NOTContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterVAR(LuluParser.VARContext ctx) { }
 	/**
 	 * {@inheritDoc}

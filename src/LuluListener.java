@@ -277,6 +277,18 @@ public interface LuluListener extends ParseTreeListener {
 	 */
 	void exitRef(LuluParser.RefContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code BITWISE_NOT}
+	 * labeled alternative in {@link LuluParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterBITWISE_NOT(LuluParser.BITWISE_NOTContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code BITWISE_NOT}
+	 * labeled alternative in {@link LuluParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitBITWISE_NOT(LuluParser.BITWISE_NOTContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code VAR}
 	 * labeled alternative in {@link LuluParser#expr}.
 	 * @param ctx the parse tree
