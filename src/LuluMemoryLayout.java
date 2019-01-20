@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import org.antlr.v4.misc.OrderedHashMap;
 
 /**
  *
@@ -9,14 +10,14 @@ import java.util.Stack;
  */
 public class LuluMemoryLayout {
     
-    public ArrayList<String> code;
+    public Map<String, ArrayList<String>> code;
     public ArrayList<Object> data;
     public int offset;
     public Stack<LuluSymbolTable> stack;
     public Map<String, LuluTypeData> heap;
     
     public LuluMemoryLayout(){
-        code = new ArrayList<>();
+        code = new OrderedHashMap<>();
         data = new ArrayList<>();
         offset = 0;
         stack = new Stack<>();
