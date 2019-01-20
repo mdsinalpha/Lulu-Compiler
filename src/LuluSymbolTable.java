@@ -6,7 +6,7 @@ import java.util.Map;
  *
  * @author mdsinalpha
  */
-public class LuluSymbolTable {
+public class LuluSymbolTable{
    
    class Pair<T,E>{
        

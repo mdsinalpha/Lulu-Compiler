@@ -6,12 +6,15 @@
 public class LuluLableGenerator {
     
     private final String starter;
+    private int counter;
     
     public LuluLableGenerator(String starter){
         this.starter = starter;
+        counter = -1;
     }
     
     public String getNextLable(){
-        return String.format("%s%d", starter, System.currentTimeMillis());
+        counter = (counter + 1) % 1000000007;
+        return String.format("%s%d%d", starter, System.currentTimeMillis()%100000, counter);
     }
 }

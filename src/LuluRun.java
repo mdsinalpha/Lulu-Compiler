@@ -24,13 +24,15 @@ public class LuluRun {
             ParseTreeWalker walker = new ParseTreeWalker();
             LuluSemanticAnalyzer loader = new LuluSemanticAnalyzer();
             walker.walk(loader, parser.program());
-            LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
+            for(String line:loader.memory.code.get("main"))
+                System.out.println(line);
+            /*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
             File output = new File(args[1]);
             FileWriter writer = new FileWriter(output);
             while(generator.hasNextLine())
                 writer.write(generator.nextLine()+"\n");
             writer.flush();
-            writer.close();
+            writer.close();*/
         }catch(Exception e){
             //TODO Make log file
             e.printStackTrace();
