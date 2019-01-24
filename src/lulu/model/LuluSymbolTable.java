@@ -3,40 +3,40 @@ package lulu.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import lulu.model.types.LuluType;
 
 /**
  *
  * @author mdsinalpha
  */
 public class LuluSymbolTable{
-   
-   class Pair<T,E>{
-       
-       public final T first;
-       public final E second;
-       
-       public Pair(T first, E second){
-           this.first = first;
-           this.second = second;
-       }
-   }
-   
-   private final Map<String, Pair<Integer, Object> > table;
+      
+   private final Map<String, LuluType> table;
+   private final LuluSymbolTable parent;
    
    public LuluSymbolTable(){
-       table = new HashMap<>();
+       this(null);
    }
    
-   public boolean has(String id){
+   public LuluSymbolTable(LuluSymbolTable parent){
+       table = new HashMap<>();
+       this.parent = parent;
+   }
+   
+   public LuluSymbolTable getParent(){
+       return parent;
+   }
+   
+   public boolean find(String id){
        return table.containsKey(id);
    }
    
-   public Pair<Integer, Object> get(String id){
+   public LuluType resolve(String id){
        return table.get(id);
    }
    
-   public void put(String id, Integer type, Integer offset){
-       table.put(id, new Pair<>(type, offset));
+   public void define(String id, LuluType type){
+       table.put(id, type);
    }
     
 }
