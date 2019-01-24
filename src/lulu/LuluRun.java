@@ -30,7 +30,7 @@ public class LuluRun {
             LuluSemanticAnalyzer loader = new LuluSemanticAnalyzer();
             walker.walk(loader, parser.program());
             loader.code.keySet().stream().map((tag) -> {
-                System.out.printf("%s: ", tag);
+                System.out.printf("%s:\n", tag);
                 return tag;
             }).forEachOrdered((tag) -> {
                 loader.code.get(tag).forEach((code) -> {

@@ -13,6 +13,7 @@ import lulu.parser.LuluParser;
 import lulu.util.LuluError;
 import lulu.util.LuluLableGenerator;
 import lulu.util.LuluTypeSystem;
+import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
@@ -42,7 +43,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     
     public LuluSemanticAnalyzer(){
-        code = new HashMap<>();
+        code = new OrderedHashMap<>();
         
         typeDeclare = new HashSet<>();
         typeDeclare.add(LuluTypeSystem.OBJECT_TAG);
@@ -59,11 +60,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         lables = new ParseTreeProperty<>();
         types = new ParseTreeProperty<>();
     }
-    
-     private void newSegment(){
-        code.put(currentScope.getTag(), new ArrayList<>());
-    }
-    
+       
     private void generateCode(String tCode){
         code.get(currentScope.getTag()).add(tCode);
     }
@@ -73,8 +70,9 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     }
     
     private void saveScope(ParserRuleContext ctx, LuluSymbolTable scope){
-        scopes.put(ctx, scope);
         currentScope = scope;
+        scopes.put(ctx, currentScope);
+        code.put(currentScope.getTag(), new ArrayList<>());
     }
     
     private void releaseScope(){
@@ -85,7 +83,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override
     public void enterProgram(LuluParser.ProgramContext ctx){
         saveScope(ctx, new LuluSymbolTable("main"));
-        newSegment();
     }
     
     @Override
@@ -130,7 +127,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             LuluSymbolTable tType = new LuluSymbolTable(t.getText(), currentScope);
             typeScopes.put(t.getText(), tType);
             saveScope(ctx, tType);
-            newSegment();
             return;
         }
         //Ambiguity
@@ -147,7 +143,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         LuluSymbolTable tType = new LuluSymbolTable(t.getText(), typeScopes.get(s.getText()));
         typeScopes.put(t.getText(), tType);
         saveScope(ctx, tType);
-        newSegment();
     }
     
     @Override
@@ -159,7 +154,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override
     public void enterBlock(LuluParser.BlockContext ctx){
         saveScope(ctx, new LuluSymbolTable(lable.getNextLable(), currentScope));
-        newSegment();
     }
     
     @Override
