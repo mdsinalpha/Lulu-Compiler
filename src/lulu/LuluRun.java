@@ -28,7 +28,7 @@ public class LuluRun {
             ParseTreeWalker walker = new ParseTreeWalker();
             LuluSemanticAnalyzer loader = new LuluSemanticAnalyzer();
             walker.walk(loader, parser.program());
-            for(String line:loader.memory.code.get("main"))
+            for(String line:loader.code.get("main"))
                 System.out.println(line);
             /*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
             File output = new File(args[1]);

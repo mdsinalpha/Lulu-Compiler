@@ -4,7 +4,7 @@ package lulu.util;
  *
  * @author mdsinalpha
  */
-public class LuluException extends Exception {
+public class LuluException{
     
     private final String message;
     private final int line;

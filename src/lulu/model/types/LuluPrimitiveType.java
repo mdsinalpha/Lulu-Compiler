@@ -25,7 +25,7 @@ public class LuluPrimitiveType implements LuluType {
         return typeCode;
     }
     
-      @Override
+    @Override
     public boolean isConst() {
        return isConst;
     }
