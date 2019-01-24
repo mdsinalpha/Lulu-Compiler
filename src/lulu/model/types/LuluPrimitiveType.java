@@ -7,15 +7,25 @@ package lulu.model.types;
 public class LuluPrimitiveType implements LuluType {
     
     private final Integer typeCode;
+    private final aModifier accessModifier;
     private final Object data;
     private final boolean isConst;
     
     public LuluPrimitiveType(Integer typeCode, Object data){
-        this(typeCode, data, false);
+        this(typeCode, aModifier.public_ ,data, false);
+    }
+    
+    public LuluPrimitiveType(Integer typeCode, aModifier accessModifier, Object data){
+        this(typeCode, accessModifier, data, false);
     }
     
     public LuluPrimitiveType(Integer typeCode, Object data, boolean isConst){
+        this(typeCode, aModifier.public_, data, isConst);
+    }
+    
+    public LuluPrimitiveType(Integer typeCode, aModifier accessModifier, Object data, boolean isConst){
         this.typeCode = typeCode;
+        this.accessModifier = accessModifier;
         this.data = data;
         this.isConst = isConst;
     }
@@ -26,6 +36,11 @@ public class LuluPrimitiveType implements LuluType {
     }
     
     @Override
+    public aModifier getAccessModifier() {
+        return accessModifier;
+    }
+    
+    @Override
     public boolean isConst() {
        return isConst;
     }
@@ -33,7 +48,5 @@ public class LuluPrimitiveType implements LuluType {
     public Object getData(){
         return data;
     }
-
-  
     
 }

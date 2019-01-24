@@ -1,5 +1,7 @@
 package lulu.util;
 
+import java.util.Map;
+import lulu.model.types.LuluObjectType;
 import lulu.parser.LuluLexer;
 
 /**
@@ -11,6 +13,7 @@ public class LuluTypeSystem{
     public static int UNDEFINED = -10;
     public static int FUNCTION = 100;
     public static int OBJECT = 101;
+    public static String OBJECT_TAG = "object";
     private static int TYPE_COUNTER = 102;
     
     public static Integer getNextObjectTypeCode(){
@@ -112,6 +115,12 @@ public class LuluTypeSystem{
     }
     
     public static boolean convertable(Integer source, Integer destination){
+        //TODO @hashemi
+        return false;
+    }
+    
+    public static boolean convertable(LuluObjectType source, LuluObjectType destination, 
+            Map<String, LuluObjectType> type){
         //TODO @hashemi
         return false;
     }

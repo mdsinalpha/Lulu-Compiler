@@ -18,7 +18,8 @@ public class LuluRun {
     public static void main(String[] args){
 
         try{
-            File input = new File(args[0]);
+             File input = new File("program.lulu");
+            //File input = new File(args[0]);
             StringBuilder program = new StringBuilder();
             Scanner scan = new Scanner(input);
             while(scan.hasNextLine())
@@ -28,13 +29,18 @@ public class LuluRun {
             ParseTreeWalker walker = new ParseTreeWalker();
             LuluSemanticAnalyzer loader = new LuluSemanticAnalyzer();
             walker.walk(loader, parser.program());
-            for(String line:loader.code.get("main"))
-                System.out.println(line);
-            /*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
+            loader.code.keySet().stream().map((tag) -> {
+                System.out.printf("%s: ", tag);
+                return tag;
+            }).forEachOrdered((tag) -> {
+                loader.code.get(tag).forEach((code) -> {
+                    System.out.println(code);
+                 });
+            }); /*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
             File output = new File(args[1]);
             FileWriter writer = new FileWriter(output);
             while(generator.hasNextLine())
-                writer.write(generator.nextLine()+"\n");
+            writer.write(generator.nextLine()+"\n");
             writer.flush();
             writer.close();*/
         }catch(Exception e){

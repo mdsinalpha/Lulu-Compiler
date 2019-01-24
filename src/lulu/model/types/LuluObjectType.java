@@ -1,8 +1,5 @@
 package lulu.model.types;
 
-
-import java.util.HashMap;
-import java.util.Map;
 import lulu.util.LuluTypeSystem;
 
 /**
@@ -12,32 +9,35 @@ import lulu.util.LuluTypeSystem;
 public class LuluObjectType implements LuluType {
     
     private final Integer typeCode;
-    private final Integer superTypeCode;
+    private final String superTag;
     private final String tag;
-    public Map<String, LuluType> fields; 
     
     public LuluObjectType(String tag){
-        this(LuluTypeSystem.OBJECT, tag);
+        this(tag, LuluTypeSystem.OBJECT_TAG);
     }
     
-    public LuluObjectType(Integer superTypeCode, String tag){
+    public LuluObjectType(String tag, String superTag){
         typeCode = LuluTypeSystem.getNextObjectTypeCode();
-        this.superTypeCode = superTypeCode;
         this.tag = tag;
-        fields = new HashMap<>();
+        this.superTag = superTag;
     }
     
     public String getTag(){
         return tag;
     }
     
-    public Integer getSuperTypeCode(){
-        return superTypeCode;
-    }
-    
     @Override
     public Integer getTypeCode() {
         return typeCode;
+    }
+    
+    public String getSuperTag(){
+        return superTag;
+    }
+    
+     @Override
+    public aModifier getAccessModifier() {
+        return aModifier.public_;
     }
 
     @Override

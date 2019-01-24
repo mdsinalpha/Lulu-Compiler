@@ -4,12 +4,12 @@ package lulu.util;
  *
  * @author mdsinalpha
  */
-public class LuluException{
+public class LuluError{
     
     private final String message;
     private final int line;
     
-    public LuluException(String message, int line){
+    public LuluError(String message, int line){
         this.message = message;
         this.line = line;
     }
