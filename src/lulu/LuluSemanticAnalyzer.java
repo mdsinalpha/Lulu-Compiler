@@ -25,7 +25,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     private LuluLableGenerator var;
     
     private LuluSymbolTable currentScope;
-    private String currentLable;
     
     public LuluSemanticAnalyzer(){
         memory = new LuluMemoryLayout();
@@ -42,8 +41,22 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         LuluSymbolTable main = new LuluSymbolTable("main");
         scopes.put(ctx, main);
         currentScope = main;
-        currentLable = main.getTag();
-        memory.code.put(currentLable, new ArrayList<>());
+        memory.code.put(currentScope.getTag(), new ArrayList<>());
+    }
+    
+    @Override
+    public void exitFunc_dcl(LuluParser.Func_dclContext ctx){
+        //TODO @pooriazmn
+    }
+    
+    @Override
+    public void exitType_dcl(LuluParser.Type_dclContext ctx){
+        //TODO @hashemi
+    }
+    
+    @Override
+    public void exitVar_def(LuluParser.Var_defContext ctx){
+        //TODO @mdsinalpha
     }
     
     
@@ -52,20 +65,18 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         LuluSymbolTable block = new LuluSymbolTable(lable.getNextLable(), currentScope);
         scopes.put(ctx, block);
         currentScope = block;
-        currentLable = block.getTag();
-        memory.code.put(currentLable, new ArrayList<>());
+        memory.code.put(currentScope.getTag(), new ArrayList<>());
     }
     
     @Override
     public void exitBlock(LuluParser.BlockContext ctx){
         currentScope = currentScope.getParent();
-        currentLable = currentScope.getTag();
     }
     
     @Override 
     public void exitINT(LuluParser.INTContext ctx){
         String variable = var.getNextLable();
-        memory.code.get(currentLable).add(String.format("%s = %s", variable, ctx.INT_CONST().getText()));
+        memory.code.get(currentScope.getTag()).add(String.format("%s = %s", variable, ctx.INT_CONST().getText()));
         lables.put(ctx, variable);
         types.put(ctx, ctx.INT_CONST().getSymbol().getType());
     }
@@ -84,7 +95,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
                 System.out.println("Error!"); //TODO throw exception
         
         String variable = var.getNextLable();
-        memory.code.get(currentLable).add(String.format("%s = %s %s %s", variable, lables.get(ctx.expr(0)), 
+        memory.code.get(currentScope.getTag()).add(String.format("%s = %s %s %s", variable, lables.get(ctx.expr(0)), 
                 ctx.ARIT_P1().getText(), lables.get(ctx.expr(1))));
         lables.put(ctx, variable);
         types.put(ctx, type);

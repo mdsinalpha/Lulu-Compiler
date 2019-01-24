@@ -7,5 +7,6 @@ package lulu.model.types;
 public interface LuluType {
 
     public Integer getTypeCode();
+    public boolean isConst();
     
 }

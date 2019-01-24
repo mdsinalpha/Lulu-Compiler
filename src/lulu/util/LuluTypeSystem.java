@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class LuluTypeSystem{
     
     public static int UNDEFINED = -10;
+    public static int FUNCTION = 100;
     
     public static Integer type(Integer operand, Integer operator){
         switch(operator){
