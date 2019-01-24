@@ -11,28 +11,34 @@ import lulu.model.types.LuluType;
  */
 public class LuluSymbolTable{
       
+   private final String tag;
    private final Map<String, LuluType> table;
    private final LuluSymbolTable parent;
    
-   public LuluSymbolTable(){
-       this(null);
+   public LuluSymbolTable(String tag){
+       this(tag ,null);
    }
    
-   public LuluSymbolTable(LuluSymbolTable parent){
+   public LuluSymbolTable(String tag, LuluSymbolTable parent){
+       this.tag = tag;
        table = new HashMap<>();
        this.parent = parent;
+   }
+   
+   public String getTag(){
+       return tag;
    }
    
    public LuluSymbolTable getParent(){
        return parent;
    }
-   
-   public boolean find(String id){
-       return table.containsKey(id);
-   }
-   
+    
    public LuluType resolve(String id){
-       return table.get(id);
+       if(table.containsKey(id))
+           return table.get(id);
+       if(parent!=null)
+           return parent.resolve(id);
+       return null;
    }
    
    public void define(String id, LuluType type){
