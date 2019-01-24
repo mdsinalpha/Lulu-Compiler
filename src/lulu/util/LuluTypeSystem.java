@@ -79,6 +79,7 @@ public class LuluTypeSystem{
                         )return LuluLexer.INT_CONST;
         return UNDEFINED;                
     }
+    
     private static Integer type3(Integer operand1, Integer operand2){
         if(operand1==LuluLexer.BOOL_CONST &&(operand2==LuluLexer.INT_CONST||
                                                           operand2==LuluLexer.BOOL_CONST)||
@@ -87,6 +88,7 @@ public class LuluTypeSystem{
                         )return LuluLexer.BOOL_CONST;
         return UNDEFINED;                
     }
+    
     private static Integer type4(Integer operand1, Integer operand2){
         if(operand1==LuluLexer.REAL_CONST && (operand2==LuluLexer.BOOL_CONST||
                                                       operand2==LuluLexer.INT_CONST||
@@ -96,6 +98,7 @@ public class LuluTypeSystem{
                    )return LuluLexer.BOOL_CONST;
         return UNDEFINED;               
     }
+    
     private static Integer type5(Integer operand1, Integer operand2){
         if(operand1==LuluLexer.STRING_CONST && (operand2==LuluLexer.BOOL_CONST||
                                                       operand2==LuluLexer.STRING_CONST)||
@@ -104,6 +107,10 @@ public class LuluTypeSystem{
         return UNDEFINED;               
     }
     
+    public static boolean convertable(Integer source, Integer destination){
+        //TODO @hashemi
+        return false;
+    }
     
     
 }
