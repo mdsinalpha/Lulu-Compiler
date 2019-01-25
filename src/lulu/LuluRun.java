@@ -16,7 +16,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 public class LuluRun {
     
     public static void main(String[] args){
-
+        
         try{
              File input = new File("program.lulu");
             //File input = new File(args[0]);
