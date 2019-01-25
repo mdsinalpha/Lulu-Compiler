@@ -14,7 +14,7 @@ public class LuluTypeSystem{
     public static int FUNCTION = 100;
     public static int OBJECT = 101;
     public static String OBJECT_TAG = "object";
-    private static int TYPE_COUNTER = 102;
+    private static int TYPE_COUNTER = 101;
     
     public static Integer getNextObjectTypeCode(){
         return TYPE_COUNTER++;
