@@ -156,6 +156,12 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public void enterBlock(LuluParser.BlockContext ctx){
         saveScope(ctx, new LuluSymbolTable(lableG.getNextLable(), currentScope));
     }
+
+    @Override
+    public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
+        lables.put(ctx, lables.get(ctx.expr()));
+        types.put(ctx, types.get(ctx.expr()));
+    }
     
     @Override
     public void exitBlock(LuluParser.BlockContext ctx){
