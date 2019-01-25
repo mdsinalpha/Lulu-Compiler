@@ -121,6 +121,15 @@ public class LuluTypeSystem{
     
     public static boolean convertable(LuluObjectType source, LuluObjectType destination, 
             Map<String, LuluObjectType> type){
+        String temp_tag = source.getTag();
+//        if(temp_tag.equals(destination.getTag()))
+//            return true
+;
+        while (!temp_tag.equals(OBJECT_TAG)){
+            if(temp_tag.equals(destination.getTag()))
+                return true;
+            temp_tag = type.get(temp_tag).getSuperTag();
+        }
         //TODO @hashemi
         return false;
     }
