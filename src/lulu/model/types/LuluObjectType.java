@@ -9,21 +9,15 @@ import lulu.util.LuluTypeSystem;
 public class LuluObjectType implements LuluType {
     
     private final Integer typeCode;
-    private final String superTag;
     private final String tag;
-    
+    private String superTag;
+    private boolean defined;
+   
     public LuluObjectType(String tag){
-        this(tag, LuluTypeSystem.OBJECT_TAG);
-    }
-    
-    public LuluObjectType(String tag, String superTag){
         typeCode = LuluTypeSystem.getNextObjectTypeCode();
         this.tag = tag;
-        this.superTag = superTag;
-    }
-    
-    public String getTag(){
-        return tag;
+        superTag = LuluTypeSystem.OBJECT_TAG;
+        defined = false;
     }
     
     @Override
@@ -31,8 +25,24 @@ public class LuluObjectType implements LuluType {
         return typeCode;
     }
     
+    public String getTag(){
+        return tag;
+    }
+    
+    public void setSuperTag(String superTag){
+        this.superTag = superTag;
+    }
+    
     public String getSuperTag(){
         return superTag;
+    }
+    
+    public void define(){
+        defined = true;
+    }
+    
+    public boolean isDefined(){
+        return defined;
     }
     
      @Override

@@ -1,6 +1,5 @@
 package lulu;
 
-
 import java.util.*;
 
 import lulu.model.LuluSymbolTable;
@@ -24,8 +23,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     public Map<String, ArrayList<String>> code;
     
-    public Set<String> typeDeclare;
-    public Map<String, LuluObjectType> type; 
+    public Map<String, LuluObjectType> typeMap; 
     
     public ArrayList<LuluError> error;
     
@@ -44,14 +42,14 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public LuluSemanticAnalyzer(){
         code = new OrderedHashMap<>();
         
-        typeDeclare = new HashSet<>();
-        typeDeclare.add(LuluTypeSystem.OBJECT_TAG);
-        type = new HashMap<>();
+        typeMap = new HashMap<>();
+        typeMap.put("object", new LuluObjectType("object"));
         
         error = new ArrayList<>();
         
         scopes = new ParseTreeProperty<>();
         typeScopes = new HashMap<>();
+        currentScope = null;
         
         lableG = new LuluLableGenerator("L");
         varG = new LuluLableGenerator("T");    
@@ -88,6 +86,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override
     public void exitProgram(LuluParser.ProgramContext ctx){
         releaseScope();
+        //TODO Check if all types are defined.
     }
 
     @Override
@@ -100,11 +99,11 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override
     public void exitType_dcl(LuluParser.Type_dclContext ctx){
         Token t = ctx.ID().getSymbol();
-        if(typeDeclare.contains(t.getText())){
+        if(typeMap.containsKey(t.getText())){
             error(String.format("Type %s already declared.", t.getText()), t);
             return;
         }
-        typeDeclare.add(ctx.ID().getText());
+        typeMap.put(t.getText(), new LuluObjectType(t.getText()));
     }
     
     @Override
@@ -116,32 +115,30 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override 
     public void enterType_def(LuluParser.Type_defContext ctx){
         Token t = ctx.ID(0).getSymbol();
-        if(!typeDeclare.contains(t.getText())){
+        if(!typeMap.containsKey(t.getText())){
             error(String.format("Type %s not declared.", t.getText()), t);
             return;
         }
-        if(type.containsKey(t.getText())){
+        LuluObjectType tObject = typeMap.get(t.getText());
+        if(tObject.isDefined()){
             error(String.format("Type %s already defined.", t.getText()), t);
             return;
         }
         if(ctx.ID(1)==null){
-            type.put(t.getText(), new LuluObjectType(t.getText()));
+            tObject.define();
             LuluSymbolTable tType = new LuluSymbolTable(t.getText(), currentScope);
             typeScopes.put(t.getText(), tType);
             saveScope(ctx, tType);
             return;
         }
-        //Ambiguity
+        //@TODO Ambiguity
         Token s = ctx.ID(1).getSymbol();
-        if(!typeDeclare.contains(s.getText())){
+        if(!typeMap.containsKey(s.getText())){
             error(String.format("Type %s not declared.", s.getText()), s);
             return;
         }
-        if(!type.containsKey(s.getText())){
-            error(String.format("Type %s not defined.", s.getText()), s);
-            return;
-        }
-        type.put(t.getText(), new LuluObjectType(t.getText(), s.getText()));
+        tObject.setSuperTag(s.getText());
+        tObject.define();
         LuluSymbolTable tType = new LuluSymbolTable(t.getText(), typeScopes.get(s.getText()));
         typeScopes.put(t.getText(), tType);
         saveScope(ctx, tType);
@@ -171,17 +168,19 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override 
     public void exitINT(LuluParser.INTContext ctx){
-        //TODO
-        Integer value = 1;
+        String text = ctx.INT_CONST().getText();
+        Integer value;
+        if(text.length()>2&&text.substring(0, 2).toLowerCase().equals("0x"))
+            value = Integer.parseInt(text.substring(2), 16);
+        else value = Integer.parseInt(text);
         values.put(ctx, value);
         types.put(ctx, LuluLexer.INT_CONST);
     }
     
     @Override
     public void exitREAL(LuluParser.REALContext ctx){
-        //TODO
-        Double value = 1.5;
-        values.put(ctx, value);
+        //TODO @mdsinalpha Implement hex real
+        values.put(ctx, Double.parseDouble(ctx.REAL_CONST().getText()));
         types.put(ctx, LuluLexer.REAL_CONST);
     }
     
@@ -193,7 +192,8 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitSTRING(LuluParser.STRINGContext ctx){
-        
+        values.put(ctx, ctx.STRING_CONST().getText());
+        types.put(ctx, LuluParser.STRING_CONST);
     }
     
     @Override 
@@ -225,4 +225,34 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         lables.put(ctx, var);
         types.put(ctx, rType);
     }
+    
+    @Override
+    public void exitPRIM(LuluParser.PRIMContext ctx){
+        Integer value = LuluTypeSystem.UNDEFINED;
+        switch(ctx.PRIM_TYPE().getText()){
+            case "int":
+                value = LuluParser.INT_CONST;
+                break;
+            case "bool":
+                value = LuluParser.BOOL_CONST;
+                break;
+            case "float":
+                value = LuluParser.REAL_CONST;
+                break;
+            case "string":
+                value = LuluParser.STRING_CONST;
+        }
+        types.put(ctx, value);
+    }
+    
+    @Override
+    public void exitID(LuluParser.IDContext ctx){
+        Token t = ctx.ID().getSymbol();
+        if(!typeMap.containsKey(t.getText())){
+            error(String.format("Type %s not declared.", t.getText()), t);
+            return;
+        }
+        types.put(ctx, typeMap.get(t.getText()).getTypeCode());
+    }
+
 }

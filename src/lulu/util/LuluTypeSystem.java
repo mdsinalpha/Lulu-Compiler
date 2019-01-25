@@ -14,7 +14,7 @@ public class LuluTypeSystem{
     public static int FUNCTION = 100;
     public static int OBJECT = 101;
     public static String OBJECT_TAG = "object";
-    private static int TYPE_COUNTER = 102;
+    private static int TYPE_COUNTER = 101;
     
     public static Integer getNextObjectTypeCode(){
         return TYPE_COUNTER++;
@@ -121,6 +121,15 @@ public class LuluTypeSystem{
     
     public static boolean convertable(LuluObjectType source, LuluObjectType destination, 
             Map<String, LuluObjectType> type){
+        String temp_tag = source.getTag();
+//        if(temp_tag.equals(destination.getTag()))
+//            return true
+;
+        while (!temp_tag.equals(OBJECT_TAG)){
+            if(temp_tag.equals(destination.getTag()))
+                return true;
+            temp_tag = type.get(temp_tag).getSuperTag();
+        }
         //TODO @hashemi
         return false;
     }
