@@ -15,7 +15,7 @@ ft_def:         type_def #TYPEC | func_def #FUNC;
 type_def:       'type' ID(':' ID)? '{' (var_def | func_def)+ '}';
 func_def:       ACCSSMOD? ('(' args_var ')' '=')? 'function' ID '(' args_var? ')' block;
 block:          '{' (var_def | stmt)* '}';
-stmt:           assign ';' #ASSIGN |
+stmt:           assign ';' #ASSIGNC |
                 func_call ';' #FUNCTIONC |
                 cond_stmt #CONDITION |
                 loop_stmt #LOOP |

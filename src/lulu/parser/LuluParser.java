@@ -1201,20 +1201,6 @@ public class LuluParser extends Parser {
 			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitCONDITION(this);
 		}
 	}
-	public static class ASSIGNContext extends StmtContext {
-		public AssignContext assign() {
-			return getRuleContext(AssignContext.class,0);
-		}
-		public ASSIGNContext(StmtContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterASSIGN(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitASSIGN(this);
-		}
-	}
 	public static class FUNCTIONCContext extends StmtContext {
 		public Func_callContext func_call() {
 			return getRuleContext(Func_callContext.class,0);
@@ -1229,6 +1215,20 @@ public class LuluParser extends Parser {
 			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitFUNCTIONC(this);
 		}
 	}
+	public static class ASSIGNCContext extends StmtContext {
+		public AssignContext assign() {
+			return getRuleContext(AssignContext.class,0);
+		}
+		public ASSIGNCContext(StmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof LuluListener ) ((LuluListener)listener).enterASSIGNC(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof LuluListener ) ((LuluListener)listener).exitASSIGNC(this);
+		}
+	}
 
 	public final StmtContext stmt() throws RecognitionException {
 		StmtContext _localctx = new StmtContext(_ctx, getState());
@@ -1239,7 +1239,7 @@ public class LuluParser extends Parser {
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,27,_ctx) ) {
 			case 1:
-				_localctx = new ASSIGNContext(_localctx);
+				_localctx = new ASSIGNCContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(213);

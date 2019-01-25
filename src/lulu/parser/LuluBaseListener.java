@@ -173,13 +173,13 @@ public class LuluBaseListener implements LuluListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterASSIGN(LuluParser.ASSIGNContext ctx) { }
+	@Override public void enterASSIGNC(LuluParser.ASSIGNCContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitASSIGN(LuluParser.ASSIGNContext ctx) { }
+	@Override public void exitASSIGNC(LuluParser.ASSIGNCContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -143,17 +143,17 @@ public interface LuluListener extends ParseTreeListener {
 	 */
 	void exitBlock(LuluParser.BlockContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ASSIGN}
+	 * Enter a parse tree produced by the {@code ASSIGNC}
 	 * labeled alternative in {@link LuluParser#stmt}.
 	 * @param ctx the parse tree
 	 */
-	void enterASSIGN(LuluParser.ASSIGNContext ctx);
+	void enterASSIGNC(LuluParser.ASSIGNCContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ASSIGN}
+	 * Exit a parse tree produced by the {@code ASSIGNC}
 	 * labeled alternative in {@link LuluParser#stmt}.
 	 * @param ctx the parse tree
 	 */
-	void exitASSIGN(LuluParser.ASSIGNContext ctx);
+	void exitASSIGNC(LuluParser.ASSIGNCContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code FUNCTIONC}
 	 * labeled alternative in {@link LuluParser#stmt}.
