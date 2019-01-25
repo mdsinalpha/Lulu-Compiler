@@ -115,6 +115,24 @@ public class LuluTypeSystem{
     }
     
     public static boolean convertable(Integer source, Integer destination){
+        switch(destination){
+            case LuluLexer.REAL_CONST:
+                if(source==LuluLexer.REAL_CONST||source==LuluLexer.INT_CONST)
+                    return true;
+                break;
+            case LuluLexer.INT_CONST:
+                if(source==LuluLexer.BOOL_CONST||source==LuluLexer.INT_CONST)
+                    return true;
+                break;
+            case LuluLexer.BOOL_CONST:
+                if(source==LuluLexer.BOOL_CONST||source==LuluLexer.INT_CONST)
+                    return true;
+                break;
+            case LuluLexer.STRING_CONST:
+                if(source==LuluLexer.STRING_CONST||source==LuluLexer.BOOL_CONST)
+                    return true;
+                break;
+        }
         //TODO @hashemi
         return false;
     }
@@ -123,14 +141,13 @@ public class LuluTypeSystem{
             Map<String, LuluObjectType> type){
         String temp_tag = source.getTag();
 //        if(temp_tag.equals(destination.getTag()))
-//            return true
-;
+//            return true;
         while (!temp_tag.equals(OBJECT_TAG)){
             if(temp_tag.equals(destination.getTag()))
                 return true;
             temp_tag = type.get(temp_tag).getSuperTag();
         }
-        //TODO @hashemi
+        //DONE @hashemi
         return false;
     }
     
