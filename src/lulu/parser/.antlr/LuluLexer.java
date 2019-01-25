@@ -1,4 +1,4 @@
-// Generated from Lulu.g4 by ANTLR 4.7.1
+// Generated from /home/mdsinalpha/Lulu/src/lulu/parser/Lulu.g4 by ANTLR 4.7.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

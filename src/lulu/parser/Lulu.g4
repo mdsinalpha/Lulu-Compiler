@@ -9,12 +9,11 @@ args:           type ('['']')* |
 args_var:       type ('['']')* ID |
                 args_var ',' type ('['']')* ID;
 type_dcl:       ID ';';
-var_def:        ('const')? type var_val (','var_val)* ';';
+var_def:        ACCSSMOD? ('const')? type var_val (','var_val)* ';';
 var_val:        ref ('='expr)?;
-ft_def:         type_def #TYPE | func_def #FUNC;
-type_def:       'type' ID(':' ID)? '{' component+ '}';
-component:      ACCSSMOD? (var_def | func_def);
-func_def:       ('(' args_var ')' '=')? 'function' ID '(' args_var? ')' block;
+ft_def:         type_def #TYPEC | func_def #FUNC;
+type_def:       'type' ID(':' ID)? '{' (var_def | func_def)+ '}';
+func_def:       ACCSSMOD? ('(' args_var ')' '=')? 'function' ID '(' args_var? ')' block;
 block:          '{' (var_def | stmt)* '}';
 stmt:           assign ';' #ASSIGN |
                 func_call ';' #FUNCTIONC |
@@ -36,7 +35,7 @@ expr:           '(' expr ')' #PARENTHESES|
                 expr LOGICAL_AND expr #LOGICAL_AND |
                 expr LOGICAL_OR expr #LOGICAL_OR |
                 'allocate' handle_call #ALLOCATION |
-                func_call #FUNCTION | var #VAR | list #LIST | 'nil' #NIL | const_val #CONST;
+                func_call #FUNCTION | var #VARC | list #LISTC | 'nil' #NIL | const_val #CONST;
 func_call:      (var'.')? handle_call #HANDLE |
                 'read' '(' var ')' #READ | 'write' '(' var ')' #WRITE;
 list:           '[' (expr|list) ( ',' (expr | list))* ']';

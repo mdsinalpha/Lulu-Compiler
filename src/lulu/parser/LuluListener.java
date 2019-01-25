@@ -1,5 +1,3 @@
-package lulu.parser;
-
 // Generated from Lulu.g4 by ANTLR 4.7.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -89,17 +87,17 @@ public interface LuluListener extends ParseTreeListener {
 	 */
 	void exitVar_val(LuluParser.Var_valContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code TYPE}
+	 * Enter a parse tree produced by the {@code TYPEC}
 	 * labeled alternative in {@link LuluParser#ft_def}.
 	 * @param ctx the parse tree
 	 */
-	void enterTYPE(LuluParser.TYPEContext ctx);
+	void enterTYPEC(LuluParser.TYPECContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code TYPE}
+	 * Exit a parse tree produced by the {@code TYPEC}
 	 * labeled alternative in {@link LuluParser#ft_def}.
 	 * @param ctx the parse tree
 	 */
-	void exitTYPE(LuluParser.TYPEContext ctx);
+	void exitTYPEC(LuluParser.TYPECContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code FUNC}
 	 * labeled alternative in {@link LuluParser#ft_def}.
@@ -122,16 +120,6 @@ public interface LuluListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitType_def(LuluParser.Type_defContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link LuluParser#component}.
-	 * @param ctx the parse tree
-	 */
-	void enterComponent(LuluParser.ComponentContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link LuluParser#component}.
-	 * @param ctx the parse tree
-	 */
-	void exitComponent(LuluParser.ComponentContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LuluParser#func_def}.
 	 * @param ctx the parse tree
@@ -290,18 +278,6 @@ public interface LuluListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitBITWISE_NOT(LuluParser.BITWISE_NOTContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code VAR}
-	 * labeled alternative in {@link LuluParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterVAR(LuluParser.VARContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code VAR}
-	 * labeled alternative in {@link LuluParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitVAR(LuluParser.VARContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code BITWISE_OR}
 	 * labeled alternative in {@link LuluParser#expr}.
@@ -471,6 +447,30 @@ public interface LuluListener extends ParseTreeListener {
 	 */
 	void exitPARENTHESES(LuluParser.PARENTHESESContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code VARC}
+	 * labeled alternative in {@link LuluParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterVARC(LuluParser.VARCContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code VARC}
+	 * labeled alternative in {@link LuluParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitVARC(LuluParser.VARCContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code LISTC}
+	 * labeled alternative in {@link LuluParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterLISTC(LuluParser.LISTCContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code LISTC}
+	 * labeled alternative in {@link LuluParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitLISTC(LuluParser.LISTCContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code CONST}
 	 * labeled alternative in {@link LuluParser#expr}.
 	 * @param ctx the parse tree
@@ -494,18 +494,6 @@ public interface LuluListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitREL(LuluParser.RELContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code LIST}
-	 * labeled alternative in {@link LuluParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterLIST(LuluParser.LISTContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code LIST}
-	 * labeled alternative in {@link LuluParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitLIST(LuluParser.LISTContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code HANDLE}
 	 * labeled alternative in {@link LuluParser#func_call}.

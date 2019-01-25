@@ -9,6 +9,7 @@ import java.util.Set;
 import lulu.model.LuluSymbolTable;
 import lulu.model.types.LuluObjectType;
 import lulu.parser.LuluBaseListener;
+import lulu.parser.LuluLexer;
 import lulu.parser.LuluParser;
 import lulu.util.LuluError;
 import lulu.util.LuluLableGenerator;
@@ -35,11 +36,12 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     private Map<String, LuluSymbolTable> typeScopes;
     private LuluSymbolTable currentScope;
      
-    private LuluLableGenerator lable;
-    private LuluLableGenerator var;
+    private LuluLableGenerator lableG;
+    private LuluLableGenerator varG;
     
-    private ParseTreeProperty<String> lables;
+    private ParseTreeProperty<Object> values;
     private ParseTreeProperty<Integer> types;
+    private ParseTreeProperty<String> lables;
     
     
     public LuluSemanticAnalyzer(){
@@ -54,9 +56,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         scopes = new ParseTreeProperty<>();
         typeScopes = new HashMap<>();
         
-        lable = new LuluLableGenerator("L");
-        var = new LuluLableGenerator("T");    
+        lableG = new LuluLableGenerator("L");
+        varG = new LuluLableGenerator("T");    
         
+        values = new ParseTreeProperty<>();
         lables = new ParseTreeProperty<>();
         types = new ParseTreeProperty<>();
     }
@@ -153,7 +156,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void enterBlock(LuluParser.BlockContext ctx){
-        saveScope(ctx, new LuluSymbolTable(lable.getNextLable(), currentScope));
+        saveScope(ctx, new LuluSymbolTable(lableG.getNextLable(), currentScope));
     }
     
     @Override
@@ -169,10 +172,29 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override 
     public void exitINT(LuluParser.INTContext ctx){
-        String variable = var.getNextLable();
-        generateCode(String.format("%s = %s", variable, ctx.INT_CONST().getText()));
-        lables.put(ctx, variable);
-        types.put(ctx, ctx.INT_CONST().getSymbol().getType());
+        //TODO
+        Integer value = 1;
+        values.put(ctx, value);
+        types.put(ctx, LuluLexer.INT_CONST);
+    }
+    
+    @Override
+    public void exitREAL(LuluParser.REALContext ctx){
+        //TODO
+        Double value = 1.5;
+        values.put(ctx, value);
+        types.put(ctx, LuluLexer.REAL_CONST);
+    }
+    
+    @Override
+    public void exitBOOL(LuluParser.BOOLContext ctx){
+        values.put(ctx, ctx.BOOL_CONST().getText().equals("true"));
+        types.put(ctx, LuluParser.BOOL_CONST);  
+    }
+    
+    @Override
+    public void exitSTRING(LuluParser.STRINGContext ctx){
+        
     }
     
     @Override 
@@ -183,7 +205,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
                 error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
                 return;
         }
-        String variable = var.getNextLable();
+        String variable = varG.getNextLable();
         generateCode(String.format("%s = %s %s %s", variable, lables.get(ctx.expr(0)), 
                 ctx.ARIT_P1().getText(), lables.get(ctx.expr(1))));
         lables.put(ctx, variable);

@@ -1,5 +1,3 @@
-package lulu.parser;
-
 // Generated from Lulu.g4 by ANTLR 4.7.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -113,13 +111,13 @@ public class LuluBaseListener implements LuluListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTYPE(LuluParser.TYPEContext ctx) { }
+	@Override public void enterTYPEC(LuluParser.TYPECContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTYPE(LuluParser.TYPEContext ctx) { }
+	@Override public void exitTYPEC(LuluParser.TYPECContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -144,18 +142,6 @@ public class LuluBaseListener implements LuluListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitType_def(LuluParser.Type_defContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterComponent(LuluParser.ComponentContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitComponent(LuluParser.ComponentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -329,18 +315,6 @@ public class LuluBaseListener implements LuluListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVAR(LuluParser.VARContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVAR(LuluParser.VARContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterBITWISE_OR(LuluParser.BITWISE_ORContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -509,6 +483,30 @@ public class LuluBaseListener implements LuluListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterVARC(LuluParser.VARCContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVARC(LuluParser.VARCContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLISTC(LuluParser.LISTCContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLISTC(LuluParser.LISTCContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterCONST(LuluParser.CONSTContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -528,18 +526,6 @@ public class LuluBaseListener implements LuluListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitREL(LuluParser.RELContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterLIST(LuluParser.LISTContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitLIST(LuluParser.LISTContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
