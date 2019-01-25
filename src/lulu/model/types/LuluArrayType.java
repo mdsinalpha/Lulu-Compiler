@@ -11,7 +11,7 @@ public class LuluArrayType<T> implements LuluType{
     private final Object[] data;
     private final aModifier accessModifier;
     private final boolean isConst;
-    
+    private final Integer[] sizes;
     public LuluArrayType(Integer[] sizes){
         this(sizes, aModifier.private_, true);
     }
@@ -31,6 +31,7 @@ public class LuluArrayType<T> implements LuluType{
         data = new Object[size];
         this.accessModifier = accessModifier;
         this.isConst = isConst;
+        this.sizes= sizes;
     }
     
     public Integer getSize(){
