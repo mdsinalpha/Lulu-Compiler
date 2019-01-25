@@ -164,7 +164,9 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitCONST(LuluParser.CONSTContext ctx){
-        lables.put(ctx, lables.get(ctx.const_val()));
+        String variable = varG.getNextLable();
+        generateCode(String.format("%s = %s", variable, values.get(ctx.const_val())));
+        lables.put(ctx, variable);
         types.put(ctx, types.get(ctx.const_val()));
     }
     
