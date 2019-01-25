@@ -29,11 +29,11 @@ public class LuluRun {
             ParseTreeWalker walker = new ParseTreeWalker();
             LuluSemanticAnalyzer loader = new LuluSemanticAnalyzer();
             walker.walk(loader, parser.program());
-            loader.code.keySet().stream().map((tag) -> {
+            loader.codeMap.keySet().stream().map((tag) -> {
                 System.out.printf("%s:\n", tag);
                 return tag;
             }).forEachOrdered((tag) -> {
-                loader.code.get(tag).forEach((code) -> {
+                loader.codeMap.get(tag).forEach((code) -> {
                     System.out.println(code);
                  });
             }); /*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);

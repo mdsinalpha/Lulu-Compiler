@@ -1,5 +1,6 @@
 package lulu.model.types;
 
+import lulu.model.LuluSymbolTable;
 import lulu.util.LuluTypeSystem;
 
 /**
@@ -10,8 +11,10 @@ public class LuluObjectType implements LuluType {
     
     private final Integer typeCode;
     private final String tag;
+    
     private String superTag;
     private boolean defined;
+    private LuluSymbolTable data;
    
     public LuluObjectType(String tag){
         typeCode = LuluTypeSystem.getNextObjectTypeCode();
@@ -53,6 +56,17 @@ public class LuluObjectType implements LuluType {
     @Override
     public boolean isConst() {
        return false;
+    }
+
+    @Override
+    public Object getData() {
+        return data;
+    }
+
+    @Override
+    public void setData(Object data) {
+        if(data instanceof LuluSymbolTable)
+            this.data = (LuluSymbolTable) data;
     }
     
 }
