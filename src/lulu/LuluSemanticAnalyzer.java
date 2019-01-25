@@ -156,6 +156,12 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public void enterBlock(LuluParser.BlockContext ctx){
         saveScope(ctx, new LuluSymbolTable(lableG.getNextLable(), currentScope));
     }
+
+    @Override
+    public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
+        lables.put(ctx, lables.get(ctx.expr()));
+        types.put(ctx, types.get(ctx.expr()));
+    }
     
     @Override
     public void exitBlock(LuluParser.BlockContext ctx){
@@ -164,7 +170,9 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitCONST(LuluParser.CONSTContext ctx){
-        lables.put(ctx, lables.get(ctx.const_val()));
+        String variable = varG.getNextLable();
+        generateCode(String.format("%s = %s", variable, values.get(ctx.const_val())));
+        lables.put(ctx, variable);
         types.put(ctx, types.get(ctx.const_val()));
     }
     
