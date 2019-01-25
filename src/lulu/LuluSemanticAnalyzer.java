@@ -1,11 +1,8 @@
 package lulu;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 import lulu.model.LuluSymbolTable;
 import lulu.model.types.LuluObjectType;
 import lulu.parser.LuluBaseListener;
@@ -92,9 +89,11 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public void exitProgram(LuluParser.ProgramContext ctx){
         releaseScope();
     }
-    
+
     @Override
     public void exitFunc_dcl(LuluParser.Func_dclContext ctx){
+        List<LuluParser.ArgsContext> args = ctx.args();
+
         //TODO @pooriazmn
     }
     
@@ -211,5 +210,19 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         lables.put(ctx, variable);
         types.put(ctx, rType);
     }
-    
+
+    @Override
+    public void exitARIT_P2(LuluParser.ARIT_P2Context ctx){
+        Token operation = ctx.ARIT_P2().getSymbol();
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)), operation.getType());
+        if(rType==LuluTypeSystem.UNDEFINED){
+            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            return;
+        }
+        String var = varG.getNextLable();
+        generateCode(String.format("%s = %s %s %s", var, lables.get(ctx.expr(0)),
+                ctx.ARIT_P2().getText(), lables.get(ctx.expr(1))));
+        lables.put(ctx, var);
+        types.put(ctx, rType);
+    }
 }
