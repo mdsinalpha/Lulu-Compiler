@@ -4,6 +4,7 @@ import java.util.*;
 
 import lulu.model.LuluSymbolTable;
 import lulu.model.types.LuluObjectType;
+import lulu.model.types.LuluType;
 import lulu.parser.LuluBaseListener;
 import lulu.parser.LuluLexer;
 import lulu.parser.LuluParser;
@@ -223,6 +224,30 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         generateCode(String.format("%s = %s %s %s", var, lables.get(ctx.expr(0)),
                 ctx.ARIT_P2().getText(), lables.get(ctx.expr(1))));
         lables.put(ctx, var);
+        types.put(ctx, rType);
+    }
+
+    @Override
+    public void exitMINUS(LuluParser.MINUSContext ctx){
+        Token operation = ctx.MINUS().getSymbol();
+        int expr_count = ctx.expr().size();
+        Integer rType = LuluTypeSystem.UNDEFINED;
+        if (expr_count == 1){
+            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), operation.getType());
+            String var = varG.getNextLable();
+            generateCode(String.format("%s = %s %s", var, operation.getText(), lables.get(ctx.expr(0))));
+            lables.put(ctx, var);
+        }else {
+            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)), operation.getType());
+            String var = varG.getNextLable();
+            generateCode(String.format("%s = %s %s %s", var, lables.get(ctx.expr(0)), operation.getText(),
+                    lables.get(ctx.expr(1))));
+            lables.put(ctx, var);
+        }
+        if(rType== LuluTypeSystem.UNDEFINED) {
+            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            return;
+        }
         types.put(ctx, rType);
     }
     
