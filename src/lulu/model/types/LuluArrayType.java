@@ -12,7 +12,7 @@ public class LuluArrayType<T> implements LuluType{
     private final Object[] data;
     private final aModifier accessModifier;
     private final boolean isConst;
-    
+    private final Integer[] sizes;
     public LuluArrayType(Integer[] sizes){
         this(sizes, aModifier.private_, true);
     }
@@ -32,20 +32,30 @@ public class LuluArrayType<T> implements LuluType{
         data = new Object[size];
         this.accessModifier = accessModifier;
         this.isConst = isConst;
+        this.sizes= sizes;
     }
     
     public Integer getSize(){
         return data.length;
     }
-    
-    public void setElement(Integer [] dimensions, T datum){
+    public Integer index (Integer [] dimensions){
         Integer index = 0;
-        data[index] = datum;
+        Integer c =1;
+        for(int i=0; i<this.sizes.length;i++){
+            c = dimensions[i];
+            for (int j = i+1; j < this.sizes.length; j++) {
+                c *= this.sizes[j]; 
+            }
+            index+=c;
+        }
+        return index;
+    }
+    public void setElement(Integer [] dimensions, T datum){
+        data[index(dimensions)] = datum;
     }
     
     public T getElement(Integer [] dimensions){
-        Integer index = 0;
-        return (T) data[index];
+        return (T) data[index(dimensions)];
     }
 
     @Override
