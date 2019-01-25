@@ -12,7 +12,7 @@ public class LuluPrimitiveType implements LuluType {
     private final boolean isConst;
     
     public LuluPrimitiveType(Integer typeCode, Object data){
-        this(typeCode, aModifier.public_ ,data, false);
+        this(typeCode, aModifier.private_ ,data, false);
     }
     
     public LuluPrimitiveType(Integer typeCode, aModifier accessModifier, Object data){
@@ -20,7 +20,7 @@ public class LuluPrimitiveType implements LuluType {
     }
     
     public LuluPrimitiveType(Integer typeCode, Object data, boolean isConst){
-        this(typeCode, aModifier.public_, data, isConst);
+        this(typeCode, aModifier.private_, data, isConst);
     }
     
     public LuluPrimitiveType(Integer typeCode, aModifier accessModifier, Object data, boolean isConst){

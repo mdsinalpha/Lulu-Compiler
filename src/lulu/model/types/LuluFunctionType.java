@@ -16,7 +16,7 @@ public class LuluFunctionType implements LuluType {
     private String codeLable;
     
     public LuluFunctionType(ArrayList<LuluType> inputTypes, ArrayList<LuluType> outputTypes){
-        this(inputTypes, outputTypes, aModifier.public_, false);
+        this(inputTypes, outputTypes, aModifier.private_, false);
     }
     
     public LuluFunctionType(ArrayList<LuluType> inputTypes, ArrayList<LuluType> outputTypes, aModifier accessModifier){
@@ -24,7 +24,7 @@ public class LuluFunctionType implements LuluType {
     }
     
     public LuluFunctionType(ArrayList<LuluType> inputTypes, ArrayList<LuluType> outputTypes, boolean isNative){
-        this(inputTypes, outputTypes, aModifier.public_, isNative);
+        this(inputTypes, outputTypes, aModifier.private_, isNative);
     }
     
     public LuluFunctionType(ArrayList<LuluType> inputTypes, ArrayList<LuluType> outputTypes, 
