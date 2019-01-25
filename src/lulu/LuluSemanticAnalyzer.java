@@ -110,6 +110,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitVar_def(LuluParser.Var_defContext ctx){
+        
         //TODO @hashemi
     }
     
