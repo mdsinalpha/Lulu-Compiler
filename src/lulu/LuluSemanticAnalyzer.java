@@ -257,9 +257,11 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override 
     public void exitARIT_P1(LuluParser.ARIT_P1Context ctx){
         Token operation = ctx.ARIT_P1().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)), operation.getType());
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
         if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
                 return;
         }
         types.put(ctx, rType);
@@ -268,9 +270,11 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override
     public void exitARIT_P2(LuluParser.ARIT_P2Context ctx){
         Token operation = ctx.ARIT_P2().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)), operation.getType());
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
         if(rType==LuluTypeSystem.UNDEFINED){
-            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            error(String.format("Incompatible types on operation %s.",
+                    operation.getText()), operation);
             return;
         }
         types.put(ctx, rType);
@@ -284,7 +288,8 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         if (expr_count == 1){
             rType = LuluTypeSystem.type(types.get(ctx.expr(0)), operation.getType());
         }else {
-            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)), operation.getType());
+            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)),
+                    operation.getType());
         }
         if(rType== LuluTypeSystem.UNDEFINED) {
             error(String.format("Incompatible types on operation %s.", operation.getText()), operation);

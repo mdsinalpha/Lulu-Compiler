@@ -21,6 +21,8 @@ public abstract class LuluType {
     
     public abstract Integer getTypeCode();
     public abstract Integer getSize();
+    public abstract boolean isDefined();
+    public abstract boolean convertable(Object o);
     
     public aModifier getAccessModifier(){
         return accessModifier;

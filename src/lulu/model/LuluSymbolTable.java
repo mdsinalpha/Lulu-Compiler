@@ -45,7 +45,7 @@ public class LuluSymbolTable{
        if(table.containsKey(id))
            for(LuluType function:table.get(id))
                if(function instanceof LuluFunctionType)
-                   if(function.equals(type))
+                   if(function.convertable(type))
                        return (LuluFunctionType) function;
        if(parent!=null)
            return parent.resolvef(id, type);

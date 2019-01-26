@@ -16,9 +16,9 @@ public class LuluFunctionType extends LuluType {
     
     private boolean defined;
     
-    public LuluFunctionType(aModifier accessModifier, boolean isConst, boolean isNative,
+    public LuluFunctionType(aModifier accessModifier, boolean isNative,
             ArrayList<LuluType> inputTypes, ArrayList<LuluType> outputTypes){
-        super(accessModifier, isConst);
+        super(accessModifier, false);
         this.isNative = isNative;
         this.inputTypes = inputTypes;
         this.outputTypes = outputTypes;
