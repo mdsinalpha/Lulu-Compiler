@@ -7,16 +7,16 @@ import lulu.util.LuluTypeSystem;
  *
  * @author mdsinalpha
  */
-public class LuluObjectType implements LuluType {
+public class LuluObjectType extends LuluType {
     
     private final Integer typeCode;
     private final String tag;
     
     private String superTag;
     private boolean defined;
-    private LuluSymbolTable data;
    
     public LuluObjectType(String tag){
+        super(aModifier.public_, false);
         typeCode = LuluTypeSystem.getNextObjectTypeCode();
         this.tag = tag;
         superTag = LuluTypeSystem.OBJECT_TAG;
@@ -26,6 +26,11 @@ public class LuluObjectType implements LuluType {
     @Override
     public Integer getTypeCode() {
         return typeCode;
+    }
+    
+    @Override
+    public Integer getSize() {
+        return 4;
     }
     
     public String getTag(){
@@ -46,32 +51,6 @@ public class LuluObjectType implements LuluType {
     
     public boolean isDefined(){
         return defined;
-    }
-    
-     @Override
-    public aModifier getAccessModifier() {
-        return aModifier.public_;
-    }
-
-    @Override
-    public boolean isConst() {
-       return false;
-    }
-
-    @Override
-    public Object getData() {
-        return data;
-    }
-
-    @Override
-    public void setData(Object data) {
-        if(data instanceof LuluSymbolTable)
-            this.data = (LuluSymbolTable) data;
-    }
-
-    @Override
-    public Integer getSize() {
-        return 4;
     }
     
     @Override
