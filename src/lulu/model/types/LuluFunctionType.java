@@ -50,18 +50,10 @@ public class LuluFunctionType extends LuluType {
     
     @Override
     public boolean convertable(Object o){
-        if(o instanceof LuluFunctionType){
-            LuluFunctionType other = (LuluFunctionType) o;
-            if(inputTypes.size()!=other.inputTypes.size()) return false;
-            if(outputTypes.size()!=other.outputTypes.size()) return false;
-            for(int i=0;i<inputTypes.size();i++)
-                if(!inputTypes.get(i).convertable(other.inputTypes.get(i)))
-                    return false;
-            for(int i=0;i<outputTypes.size();i++)
-                if(!outputTypes.get(i).convertable(other.outputTypes.get(i)))
-                    return false;
-            return true;
-        }
+        if(o instanceof LuluFunctionType)
+            if(LuluTypeSystem.convertable(this, (LuluFunctionType)o, null))//TODO
+                return true;
+        
         return false;
     }
     
