@@ -8,8 +8,9 @@ public class LuluPrimitiveType implements LuluType {
     
     private final Integer typeCode;
     private final aModifier accessModifier;
-    private final Object data;
     private final boolean isConst;
+    
+    private Object data;
     
     public LuluPrimitiveType(Integer typeCode, Object data){
         this(typeCode, aModifier.private_ ,data, false);
@@ -45,8 +46,14 @@ public class LuluPrimitiveType implements LuluType {
        return isConst;
     }
     
+    @Override
     public Object getData(){
         return data;
+    }
+
+    @Override
+    public void setData(Object data) {
+        this.data = data;
     }
     
 }

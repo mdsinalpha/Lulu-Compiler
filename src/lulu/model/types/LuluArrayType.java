@@ -8,6 +8,7 @@ import lulu.util.LuluTypeSystem;
  */
 public class LuluArrayType<T> implements LuluType{
     
+    
     private final Object[] data;
     private final aModifier accessModifier;
     private final boolean isConst;
@@ -73,5 +74,13 @@ public class LuluArrayType<T> implements LuluType{
     public boolean isConst() {
         return isConst;
     }
+
+    @Override
+    public Object getData() {
+       return data;
+    }
+
+    @Override
+    public void setData(Object data) {}
     
 }

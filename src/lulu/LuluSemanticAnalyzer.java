@@ -3,6 +3,7 @@ package lulu;
 import java.util.*;
 
 import lulu.model.LuluSymbolTable;
+import lulu.model.types.LuluArrayType;
 import lulu.model.types.LuluObjectType;
 import lulu.model.types.LuluType;
 import lulu.parser.LuluBaseListener;
@@ -22,62 +23,64 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  */
 public class LuluSemanticAnalyzer extends LuluBaseListener {
     
-    public Map<String, ArrayList<String>> code;
+    public Map<String, ArrayList<String>> codeMap;
     
-    public Map<String, LuluObjectType> typeMap; 
+    public Map<String, LuluObjectType> typeMapS; 
+    public Map<Integer, LuluObjectType> typeMapI;
     
-    public ArrayList<LuluError> error;
+    public ArrayList<LuluError> errorList;
     
     private ParseTreeProperty<LuluSymbolTable> scopes;
-    private Map<String, LuluSymbolTable> typeScopes;
     private LuluSymbolTable currentScope;
+    private LuluSymbolTable currentTypeScope;
      
-    private LuluLableGenerator lableG;
-    private LuluLableGenerator varG;
+    private LuluLableGenerator lableGenerator;
+    private LuluLableGenerator variableGenerator;
     
     private ParseTreeProperty<Object> values;
     private ParseTreeProperty<Integer> types;
-    private ParseTreeProperty<String> lables;
+    private ParseTreeProperty<String> variables;
     
     
     public LuluSemanticAnalyzer(){
-        code = new OrderedHashMap<>();
+        codeMap = new OrderedHashMap<>();
         
-        typeMap = new HashMap<>();
-        typeMap.put("object", new LuluObjectType("object"));
+        typeMapS = new HashMap<>();
+        typeMapI = new HashMap<>();
+        LuluObjectType object = new LuluObjectType(LuluTypeSystem.OBJECT_TAG);
+        typeMapS.put(LuluTypeSystem.OBJECT_TAG, object);
+        typeMapI.put(LuluTypeSystem.OBJECT, object);
         
-        error = new ArrayList<>();
+        errorList = new ArrayList<>();
         
         scopes = new ParseTreeProperty<>();
-        typeScopes = new HashMap<>();
-        currentScope = null;
         
-        lableG = new LuluLableGenerator("L");
-        varG = new LuluLableGenerator("T");    
+        lableGenerator = new LuluLableGenerator("L");
+        variableGenerator = new LuluLableGenerator("T");    
         
         values = new ParseTreeProperty<>();
-        lables = new ParseTreeProperty<>();
+        variables = new ParseTreeProperty<>();
         types = new ParseTreeProperty<>();
     }
        
     private void generateCode(String tCode){
-        code.get(currentScope.getTag()).add(tCode);
+        codeMap.get(currentScope.getTag()).add(tCode);
     }
     
     private void error(String message, Token token){
-        error.add(new LuluError(message, token.getLine()));
+        errorList.add(new LuluError(message, token.getLine()));
     }
     
     private void saveScope(ParserRuleContext ctx, LuluSymbolTable scope){
         currentScope = scope;
         scopes.put(ctx, currentScope);
-        code.put(currentScope.getTag(), new ArrayList<>());
+        codeMap.put(currentScope.getTag(), new ArrayList<>());
     }
     
     private void releaseScope(){
         currentScope = currentScope.getParent();
     }
-    
+        
    
     @Override
     public void enterProgram(LuluParser.ProgramContext ctx){
@@ -100,11 +103,13 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override
     public void exitType_dcl(LuluParser.Type_dclContext ctx){
         Token t = ctx.ID().getSymbol();
-        if(typeMap.containsKey(t.getText())){
+        if(typeMapS.containsKey(t.getText())){
             error(String.format("Type %s already declared.", t.getText()), t);
             return;
         }
-        typeMap.put(t.getText(), new LuluObjectType(t.getText()));
+        LuluObjectType object = new LuluObjectType(t.getText());
+        typeMapS.put(t.getText(), object);
+        typeMapI.put(object.getTypeCode(), object);
     }
     
     @Override
@@ -117,49 +122,51 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override 
     public void enterType_def(LuluParser.Type_defContext ctx){
         Token t = ctx.ID(0).getSymbol();
-        if(!typeMap.containsKey(t.getText())){
+        if(!typeMapS.containsKey(t.getText())){
             error(String.format("Type %s not declared.", t.getText()), t);
             return;
         }
-        LuluObjectType tObject = typeMap.get(t.getText());
+        LuluObjectType tObject = typeMapS.get(t.getText());
         if(tObject.isDefined()){
             error(String.format("Type %s already defined.", t.getText()), t);
             return;
         }
         if(ctx.ID(1)==null){
-            tObject.define();
             LuluSymbolTable tType = new LuluSymbolTable(t.getText(), currentScope);
-            typeScopes.put(t.getText(), tType);
+            tObject.setData(tType);
+            tObject.define();
+            currentTypeScope = tType;
             saveScope(ctx, tType);
             return;
         }
-        //@TODO Ambiguity
         Token s = ctx.ID(1).getSymbol();
-        if(!typeMap.containsKey(s.getText())){
+        if(!typeMapS.containsKey(s.getText())){
             error(String.format("Type %s not declared.", s.getText()), s);
             return;
         }
         tObject.setSuperTag(s.getText());
+        LuluSymbolTable tType = new LuluSymbolTable(t.getText(), (LuluSymbolTable) typeMapS.get(s.getText()).getData());
+        tObject.setData(t);
         tObject.define();
-        LuluSymbolTable tType = new LuluSymbolTable(t.getText(), typeScopes.get(s.getText()));
-        typeScopes.put(t.getText(), tType);
+        currentTypeScope = tType;
         saveScope(ctx, tType);
     }
     
     @Override
     public void exitType_def(LuluParser.Type_defContext ctx){
         releaseScope();
+        currentTypeScope = null;
     }
     
     
     @Override
     public void enterBlock(LuluParser.BlockContext ctx){
-        saveScope(ctx, new LuluSymbolTable(lableG.getNextLable(), currentScope));
+        saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
     }
 
     @Override
     public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
-        lables.put(ctx, lables.get(ctx.expr()));
+        variables.put(ctx, variables.get(ctx.expr()));
         types.put(ctx, types.get(ctx.expr()));
     }
     
@@ -170,9 +177,9 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitCONST(LuluParser.CONSTContext ctx){
-        String variable = varG.getNextLable();
+        String variable = variableGenerator.getNextLable();
         generateCode(String.format("%s = %s", variable, values.get(ctx.const_val())));
-        lables.put(ctx, variable);
+        variables.put(ctx, variable);
         types.put(ctx, types.get(ctx.const_val()));
     }
     
@@ -214,10 +221,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
                 error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
                 return;
         }
-        String variable = varG.getNextLable();
-        generateCode(String.format("%s = %s %s %s", variable, lables.get(ctx.expr(0)), 
-                ctx.ARIT_P1().getText(), lables.get(ctx.expr(1))));
-        lables.put(ctx, variable);
+        String variable = variableGenerator.getNextLable();
+        generateCode(String.format("%s = %s %s %s", variable, variables.get(ctx.expr(0)), 
+                ctx.ARIT_P1().getText(), variables.get(ctx.expr(1))));
+        variables.put(ctx, variable);
         types.put(ctx, rType);
     }
 
@@ -229,10 +236,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
             return;
         }
-        String var = varG.getNextLable();
-        generateCode(String.format("%s = %s %s %s", var, lables.get(ctx.expr(0)),
-                ctx.ARIT_P2().getText(), lables.get(ctx.expr(1))));
-        lables.put(ctx, var);
+        String var = variableGenerator.getNextLable();
+        generateCode(String.format("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.ARIT_P2().getText(), variables.get(ctx.expr(1))));
+        variables.put(ctx, var);
         types.put(ctx, rType);
     }
 
@@ -240,18 +247,18 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public void exitMINUS(LuluParser.MINUSContext ctx){
         Token operation = ctx.MINUS().getSymbol();
         int expr_count = ctx.expr().size();
-        Integer rType = LuluTypeSystem.UNDEFINED;
+        Integer rType;
         if (expr_count == 1){
             rType = LuluTypeSystem.type(types.get(ctx.expr(0)), operation.getType());
-            String var = varG.getNextLable();
-            generateCode(String.format("%s = %s %s", var, operation.getText(), lables.get(ctx.expr(0))));
-            lables.put(ctx, var);
+            String var = variableGenerator.getNextLable();
+            generateCode(String.format("%s = %s %s", var, operation.getText(), variables.get(ctx.expr(0))));
+            variables.put(ctx, var);
         }else {
             rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)), operation.getType());
-            String var = varG.getNextLable();
-            generateCode(String.format("%s = %s %s %s", var, lables.get(ctx.expr(0)), operation.getText(),
-                    lables.get(ctx.expr(1))));
-            lables.put(ctx, var);
+            String var = variableGenerator.getNextLable();
+            generateCode(String.format("%s = %s %s %s", var, variables.get(ctx.expr(0)), operation.getText(),
+                    variables.get(ctx.expr(1))));
+            variables.put(ctx, var);
         }
         if(rType== LuluTypeSystem.UNDEFINED) {
             error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
@@ -282,11 +289,58 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override
     public void exitID(LuluParser.IDContext ctx){
         Token t = ctx.ID().getSymbol();
-        if(!typeMap.containsKey(t.getText())){
+        if(!typeMapS.containsKey(t.getText())){
             error(String.format("Type %s not declared.", t.getText()), t);
             return;
         }
-        types.put(ctx, typeMap.get(t.getText()).getTypeCode());
+        types.put(ctx, typeMapS.get(t.getText()).getTypeCode());
     }
-
+    
+    @Override
+    public void exitRef(LuluParser.RefContext ctx){
+        boolean hasError = false;
+        for(LuluParser.ExprContext e:ctx.expr())
+            if(types.get(e)==null||types.get(e)!=LuluParser.INT_CONST){
+                hasError = true;
+                error("Invalid array indexing.", e.getStart());
+            }
+        if(hasError) return;
+        values.put(ctx, ctx.ID().getText());
+        types.put(ctx, ctx.expr().isEmpty()?LuluTypeSystem.OBJECT:LuluTypeSystem.ARRAY);
+    }
+    
+    @Override
+    public void exitVar(LuluParser.VarContext ctx){
+       LuluSymbolTable varScope = currentScope;
+       Token t = ctx.getStart();
+       if(t!=null&&t.getText().equals("this")){
+           if(currentTypeScope==null){
+               error("Unresolved refrence to keyword 'this'.", t);
+               return;
+           }
+           varScope = currentTypeScope;
+       }
+       else if(t!=null&&t.getText().equals("super")){
+           if(currentTypeScope==null||typeMapS.get(currentTypeScope.getTag()).getSuperTag().equals(LuluTypeSystem.OBJECT_TAG)){
+               error("Unresolved refrence to keyword 'super'.", t);
+               return;
+           }
+           varScope = currentTypeScope.getParent();
+       }
+       
+       LuluType it = null;
+       for(LuluParser.RefContext r:ctx.ref()){
+           String id = values.get(r).toString();
+           it = varScope.resolve(id);
+           if(it==null){
+               error(String.format("Undefined field %s inside type %s.", id, varScope.getTag()), r.getStart());
+               return;
+           }
+           if(it instanceof LuluArrayType){
+               
+           }
+           
+           //varScope = typeScopes.get(((LuluObjectType)it).getTag());
+       }
+    }
 }

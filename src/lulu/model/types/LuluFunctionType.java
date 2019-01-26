@@ -9,10 +9,11 @@ import lulu.util.LuluTypeSystem;
  */
 public class LuluFunctionType implements LuluType {
     
-    public ArrayList<LuluType> inputTypes;
-    public ArrayList<LuluType> outputTypes;
+    public final ArrayList<LuluType> inputTypes;
+    public final ArrayList<LuluType> outputTypes;
     private final aModifier accessModifier;
     private final boolean isNative;
+    
     private String codeLable;
     
     public LuluFunctionType(ArrayList<LuluType> inputTypes, ArrayList<LuluType> outputTypes){
@@ -39,11 +40,14 @@ public class LuluFunctionType implements LuluType {
         return isNative;
     }
     
-    public void setCodeLable(String codeLable){
-        this.codeLable = codeLable;
+    @Override
+    public void setData(Object codeLable){
+        if(codeLable instanceof String)
+            this.codeLable = codeLable.toString();
     }
     
-    public String getCodeLable(){
+    @Override
+    public String getData(){
         return codeLable;
     }
     
