@@ -134,7 +134,7 @@ public class LuluTypeSystem{
             case LuluLexer.STRING_CONST:
                 if(source==LuluLexer.STRING_CONST||source==LuluLexer.BOOL_CONST)
                     return true;
-                    break;
+                break;
         }
         return false;
     }
