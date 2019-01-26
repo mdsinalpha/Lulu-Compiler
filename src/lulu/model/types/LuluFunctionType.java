@@ -13,13 +13,16 @@ public class LuluFunctionType extends LuluType {
     
     public final ArrayList<LuluType> inputTypes;
     public final ArrayList<LuluType> outputTypes;
-       
+    
+    private boolean defined;
+    
     public LuluFunctionType(aModifier accessModifier, boolean isConst, boolean isNative,
             ArrayList<LuluType> inputTypes, ArrayList<LuluType> outputTypes){
         super(accessModifier, isConst);
         this.isNative = isNative;
         this.inputTypes = inputTypes;
         this.outputTypes = outputTypes;
+        this.defined = false;
     }
     
     @Override
@@ -35,9 +38,18 @@ public class LuluFunctionType extends LuluType {
     public boolean isNative(){
         return isNative;
     }
-         
+       
+    public void define(){
+        defined = true;
+    }
+    
     @Override
-    public boolean equals(Object o){
+    public boolean isDefined(){
+        return defined;
+    }
+    
+    @Override
+    public boolean convertable(Object o){
         if(o instanceof LuluFunctionType){
             LuluFunctionType other = (LuluFunctionType) o;
             if(inputTypes.size()!=other.inputTypes.size()) return false;

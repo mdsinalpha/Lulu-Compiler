@@ -49,12 +49,14 @@ public class LuluObjectType extends LuluType {
         defined = true;
     }
     
+    @Override
     public boolean isDefined(){
         return defined;
     }
     
+    //TODO convertable()
     @Override
-    public boolean equals(Object o){
+    public boolean convertable(Object o){
         if(o instanceof LuluObjectType)
             return typeCode.equals(((LuluObjectType) o).getTypeCode());
         return false;

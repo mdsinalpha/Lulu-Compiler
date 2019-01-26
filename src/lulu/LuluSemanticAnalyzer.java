@@ -4,7 +4,9 @@ import java.util.*;
 
 import lulu.model.LuluSymbolTable;
 import lulu.model.types.LuluArrayType;
+import lulu.model.types.LuluFunctionType;
 import lulu.model.types.LuluObjectType;
+import lulu.model.types.LuluPrimitiveType;
 import lulu.model.types.LuluType;
 import lulu.parser.LuluBaseListener;
 import lulu.parser.LuluLexer;
@@ -41,6 +43,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     //private ParseTreeProperty<String> variables;
     
     public static final String GLOBAL_TAG = "main";
+    public static final String MAIN_TAG = "start";
     
     
     public LuluSemanticAnalyzer(){
@@ -94,9 +97,21 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitProgram(LuluParser.ProgramContext ctx){
+        //DONE @hashemi Check if all types are defined.
+        if(currentScope.hasUndefinedFields()){
+            error("Undefined fields inside declare block.", ctx.getStop());
+        }
+        //DONE @hashemi Check wether start function is defined.
+        ArrayList<LuluType> out = new ArrayList<>();
+        out.add(new LuluPrimitiveType(LuluType.aModifier.public_, false, LuluParser.INT_CONST));
+        LuluFunctionType start = new LuluFunctionType(LuluType.aModifier.public_,
+                false, new ArrayList<>(), out);
+        LuluType tType = currentScope.resolvef(MAIN_TAG, start);
+        if(tType == null){
+            error("Expecting start function definition.", ctx.getStop());
+            return;
+        }
         releaseScope();
-        //TODO @hashemi Check if all types are defined.
-        //TODO @pooriazmn Check wether start function is defined.
     }
 
     @Override

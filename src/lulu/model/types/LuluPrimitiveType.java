@@ -36,9 +36,17 @@ public class LuluPrimitiveType extends LuluType {
     }
     
     @Override
-    public boolean equals(Object o){
+    public boolean isDefined(){
+        return true;
+    }
+    
+    //TODO convertable()
+    @Override
+    public boolean convertable(Object o){
         if(o instanceof LuluPrimitiveType)
             return typeCode.equals(((LuluPrimitiveType) o).getTypeCode());
         return false;
     }
+    
+    
 }

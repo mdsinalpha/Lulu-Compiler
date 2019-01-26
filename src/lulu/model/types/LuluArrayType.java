@@ -62,4 +62,13 @@ public class LuluArrayType extends LuluType{
         return elements[index(dimensions)];
     }
     
+    @Override
+    public boolean isDefined(){
+        return true;
+    }
+    
+    //TODO convertable()
+    public boolean convertable(Object o){
+        return false;
+    }
 }

@@ -134,36 +134,22 @@ public class LuluTypeSystem{
             case LuluLexer.STRING_CONST:
                 if(source==LuluLexer.STRING_CONST||source==LuluLexer.BOOL_CONST)
                     return true;
-                break;
+                    break;
         }
-        //DONE @hashemi
         return false;
     }
     
-    public static Object convert(LuluPrimitiveType source, LuluPrimitiveType destination){
-        //TODO @hashemi
-        return null;
-    }
     
     public static boolean convertable(LuluObjectType source, LuluObjectType destination, 
             Map<String, LuluObjectType> type){
         String temp_tag = source.getTag();
-//        if(temp_tag.equals(destination.getTag()))
-//            return true;
         while (!temp_tag.equals(OBJECT_TAG)){
             if(temp_tag.equals(destination.getTag()))
                 return true;
             temp_tag = type.get(temp_tag).getSuperTag();
         }
-        //DONE @hashemi
         return false;
     }
     
-    
-    public static LuluSymbolTable convert(LuluObjectType source, LuluObjectType destination,
-            Map<String, LuluObjectType> type){
-        //TODO @hashmei
-        return null;
-    }
     
 }

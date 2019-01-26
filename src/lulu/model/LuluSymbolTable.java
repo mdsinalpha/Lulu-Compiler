@@ -63,4 +63,14 @@ public class LuluSymbolTable{
         return 10 + (parent!=null?parent.getSize():0) + fields;
    }
     
+    public boolean hasUndefinedFields() {
+        for (List<LuluType> typeList : table.values()) {
+            for (LuluType type : typeList) {
+                if(!type.isDefined())
+                    return true;
+            }
+        }
+        return false;
+    }
+   
 }
