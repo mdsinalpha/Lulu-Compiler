@@ -1,5 +1,6 @@
 package lulu.model;
 
+import java.util.List;
 import lulu.model.types.LuluFunctionType;
 import lulu.model.types.LuluType;
 import org.antlr.v4.runtime.misc.MultiMap;
@@ -56,7 +57,10 @@ public class LuluSymbolTable{
    }
       
    public Integer getSize(){
-        return 10 + (parent!=null?parent.getSize():0) + table.values().stream().mapToInt(LuluType::getSize).sum();
+        Integer fields = 0;
+        for(List<LuluType> ltype:table.values())
+            fields = ltype.stream().map((type) -> type.getSize()).reduce(fields, Integer::sum);
+        return 10 + (parent!=null?parent.getSize():0) + fields;
    }
     
 }
