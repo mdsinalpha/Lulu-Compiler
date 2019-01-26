@@ -64,13 +64,9 @@ public class LuluSymbolTable{
    }
     
     public boolean hasUndefinedFields() {
-        for (List<LuluType> typeList : table.values()) {
-            for (LuluType type : typeList) {
-                if(!type.isDefined())
-                    return true;
-            }
-        }
-        return false;
+        return table.values().stream().anyMatch((typeList) -> 
+                (typeList.stream().anyMatch((type) ->
+                        (!type.isDefined()))));
     }
    
 }

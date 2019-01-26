@@ -1,6 +1,7 @@
 package lulu.model.types;
 
 import lulu.parser.LuluParser;
+import lulu.util.LuluTypeSystem;
 
 /**
  *
@@ -40,11 +41,10 @@ public class LuluPrimitiveType extends LuluType {
         return true;
     }
     
-    //TODO convertable()
     @Override
     public boolean convertable(Object o){
         if(o instanceof LuluPrimitiveType)
-            return typeCode.equals(((LuluPrimitiveType) o).getTypeCode());
+            return LuluTypeSystem.convertable(typeCode, ((LuluPrimitiveType) o).getTypeCode());
         return false;
     }
     

@@ -12,14 +12,14 @@ public class LuluObjectType extends LuluType {
     private final Integer typeCode;
     private final String tag;
     
-    private String superTag;
+    private Integer superTypeCode;
     private boolean defined;
    
     public LuluObjectType(String tag){
         super(aModifier.public_, false);
         typeCode = LuluTypeSystem.getNextObjectTypeCode();
         this.tag = tag;
-        superTag = LuluTypeSystem.OBJECT_TAG;
+        superTypeCode = LuluTypeSystem.OBJECT;
         defined = false;
     }
     
@@ -37,12 +37,12 @@ public class LuluObjectType extends LuluType {
         return tag;
     }
     
-    public void setSuperTag(String superTag){
-        this.superTag = superTag;
+    public void setSuperTypeCode(Integer superTypeCode){
+        this.superTypeCode = superTypeCode;
     }
     
-    public String getSuperTag(){
-        return superTag;
+    public Integer getSuperTypeCode(){
+        return superTypeCode;
     }
     
     public void define(){
