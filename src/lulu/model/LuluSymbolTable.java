@@ -1,9 +1,5 @@
 package lulu.model;
 
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lulu.model.types.LuluFunctionType;
 import lulu.model.types.LuluType;
 import org.antlr.v4.runtime.misc.MultiMap;
@@ -15,8 +11,7 @@ import org.antlr.v4.runtime.misc.MultiMap;
 public class LuluSymbolTable{
       
    private final String tag;
-   private final Map<String, LuluType> table;
-   private final MultiMap<String, LuluFunctionType> ftable;
+   private final MultiMap<String, LuluType> table;
    private final LuluSymbolTable parent;
    
    public LuluSymbolTable(String tag){
@@ -25,8 +20,7 @@ public class LuluSymbolTable{
    
    public LuluSymbolTable(String tag, LuluSymbolTable parent){
        this.tag = tag;
-       table = new HashMap<>();
-       ftable = new MultiMap<>();
+       table = new MultiMap<>();
        this.parent = parent;
    }
   
@@ -37,29 +31,28 @@ public class LuluSymbolTable{
    public LuluSymbolTable getParent(){
        return parent;
    }
-    
+   
    public LuluType resolve(String id){
        if(table.containsKey(id))
-           return table.get(id);
+           return table.get(id).get(0);
        if(parent!=null)
            return parent.resolve(id);
        return null;
    }
-   
-   public List<LuluFunctionType> resolvef(String id){
-       if(ftable.containsKey(id))
-           return ftable.get(id);
+    
+   public LuluFunctionType resolvef(String id, LuluFunctionType type){
+       if(table.containsKey(id))
+           for(LuluType function:table.get(id))
+               if(function instanceof LuluFunctionType)
+                   if(function.equals(type))
+                       return (LuluFunctionType) function;
        if(parent!=null)
-           return parent.resolvef(id);
+           return parent.resolvef(id, type);
        return null;
    }
-   
+     
    public void define(String id, LuluType type){
-       table.put(id, type);
-   }
-   
-   public void definef(String id, LuluFunctionType function){
-       ftable.map(id, function);
+       table.map(id, type);
    }
     
 }

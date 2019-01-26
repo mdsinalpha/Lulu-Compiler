@@ -95,8 +95,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
 
     @Override
     public void exitFunc_dcl(LuluParser.Func_dclContext ctx){
-        List<LuluParser.ArgsContext> args = ctx.args();
-
         //TODO @pooriazmn
     }
     
@@ -107,9 +105,9 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             error(String.format("Type %s already declared.", t.getText()), t);
             return;
         }
-        LuluObjectType object = new LuluObjectType(t.getText());
-        typeMapS.put(t.getText(), object);
-        typeMapI.put(object.getTypeCode(), object);
+        LuluObjectType tObject = new LuluObjectType(t.getText());
+        typeMapS.put(t.getText(), tObject);
+        typeMapI.put(tObject.getTypeCode(), tObject);
     }
     
     @Override
@@ -122,11 +120,12 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override 
     public void enterType_def(LuluParser.Type_defContext ctx){
         Token t = ctx.ID(0).getSymbol();
+        LuluObjectType tObject;
         if(!typeMapS.containsKey(t.getText())){
-            error(String.format("Type %s not declared.", t.getText()), t);
-            return;
-        }
-        LuluObjectType tObject = typeMapS.get(t.getText());
+            tObject = new LuluObjectType(t.getText());
+            typeMapS.put(t.getText(), tObject);
+            typeMapI.put(tObject.getTypeCode(), tObject);
+        } else tObject = typeMapS.get(t.getText());
         if(tObject.isDefined()){
             error(String.format("Type %s already defined.", t.getText()), t);
             return;
@@ -298,6 +297,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitRef(LuluParser.RefContext ctx){
+        //TODO Int error checking
         boolean hasError = false;
         for(LuluParser.ExprContext e:ctx.expr())
             if(types.get(e)==null||types.get(e)!=LuluParser.INT_CONST){

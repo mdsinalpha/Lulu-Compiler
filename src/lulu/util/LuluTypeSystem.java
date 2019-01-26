@@ -1,7 +1,9 @@
 package lulu.util;
 
 import java.util.Map;
+import lulu.model.LuluSymbolTable;
 import lulu.model.types.LuluObjectType;
+import lulu.model.types.LuluPrimitiveType;
 import lulu.parser.LuluLexer;
 
 /**
@@ -138,6 +140,11 @@ public class LuluTypeSystem{
         return false;
     }
     
+    public static Object convert(LuluPrimitiveType source, LuluPrimitiveType destination){
+        //TODO @hashemi
+        return null;
+    }
+    
     public static boolean convertable(LuluObjectType source, LuluObjectType destination, 
             Map<String, LuluObjectType> type){
         String temp_tag = source.getTag();
@@ -152,5 +159,11 @@ public class LuluTypeSystem{
         return false;
     }
     
+    
+    public static LuluSymbolTable convert(LuluObjectType source, LuluObjectType destination,
+            Map<String, LuluObjectType> type){
+        //TODO @hashmei
+        return null;
+    }
     
 }

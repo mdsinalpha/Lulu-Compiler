@@ -65,5 +65,27 @@ public class LuluFunctionType implements LuluType {
     public boolean isConst() {
        return true;
     }
+
+    @Override
+    public Integer getSize() {
+        return 4;
+    }
+    
+    @Override
+    public boolean equals(Object o){
+        if(o instanceof LuluFunctionType){
+            LuluFunctionType other = (LuluFunctionType) o;
+            if(inputTypes.size()!=other.inputTypes.size()) return false;
+            if(outputTypes.size()!=other.outputTypes.size()) return false;
+            for(int i=0;i<inputTypes.size();i++)
+                if(!inputTypes.get(i).equals(other.inputTypes.get(i)))
+                    return false;
+            for(int i=0;i<outputTypes.size();i++)
+                if(!outputTypes.get(i).equals(other.outputTypes.get(i)))
+                    return false;
+            return true;
+        }
+        return false;
+    }
     
 }

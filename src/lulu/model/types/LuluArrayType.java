@@ -35,9 +35,15 @@ public class LuluArrayType<T> implements LuluType{
         this.sizes= sizes;
     }
     
+    @Override
     public Integer getSize(){
+        return 4;
+    }
+    
+    public Integer getLength(){
         return data.length;
     }
+    
     public Integer index (Integer [] dimensions){
         Integer index = 0;
         Integer c =1;
