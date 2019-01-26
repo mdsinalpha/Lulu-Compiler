@@ -37,6 +37,7 @@ public class LuluArrayType<T> implements LuluType{
     public Integer getSize(){
         return data.length;
     }
+    
     public Integer index (Integer [] dimensions){
         Integer index = 0;
         Integer c =1;
@@ -49,6 +50,7 @@ public class LuluArrayType<T> implements LuluType{
         }
         return index;
     }
+    
     public void setElement(Integer [] dimensions, T datum){
         data[index(dimensions)] = datum;
     }
