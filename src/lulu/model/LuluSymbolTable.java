@@ -32,6 +32,10 @@ public class LuluSymbolTable{
    public LuluSymbolTable getParent(){
        return parent;
    }
+  
+   public boolean has(String id){
+        return table.containsKey(id);
+   }
    
    public LuluType resolve(String id){
        if(table.containsKey(id))

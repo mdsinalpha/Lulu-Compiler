@@ -226,7 +226,47 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitVar_def(LuluParser.Var_defContext ctx){
-        //TODO @hashemi
+        // Define a variable inside current scope's symbol table:
+        if(!(ctx.getParent() instanceof LuluParser.Type_defContext) &&
+                ctx.ACCSSMOD() != null){
+            error("Access modifiers are only allowed inside a type block.", ctx.ACCSSMOD().getSymbol());
+            return;
+        }
+        LuluType.aModifier tAM = LuluType.aModifier.public_;
+        if(ctx.ACCSSMOD() != null)
+            switch(ctx.ACCSSMOD().getText()){
+                case "private":
+                    tAM = LuluType.aModifier.private_;
+                    break;
+                case "protected":
+                    tAM = LuluType.aModifier.protected_;
+                    break;
+                case "public":
+                    tAM = LuluType.aModifier.public_;
+                    break;
+        }
+        boolean tConst = ctx.getToken(12, 0) != null;
+        Integer tCode = types.get(ctx.type());
+        for(LuluParser.Var_valContext v: ctx.var_val()){
+            Token tID = v.ref().ID().getSymbol();
+            if(currentScope.has(tID.getText())){
+                // This ID is taken!
+                error(String.format("Variable name %s is already taken by another field.", tID.getText()), tID);
+                return;
+            }
+            LuluType tType;
+            if(types.get(v) == LuluTypeSystem.ARRAY)
+                tType = new LuluArrayType(tAM, tConst, tCode, new Integer[(Integer)values.get(v)]);
+            else if(primMap.containsKey(tCode))
+                tType = new LuluPrimitiveType(tAM, tConst, tCode);
+            //TODO @mdsinalpha check here!
+            else tType = new LuluObjectType(typeMap.get(tCode).getTag());
+            //TODO Type checking:
+            if(v.expr() != null){
+                
+            }
+            currentScope.define(tID.getText(), tType);
+        }
     }
     
     
@@ -388,15 +428,16 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitRef(LuluParser.RefContext ctx){
-        //TODO Int error checking
-        boolean hasError = false;
-        for(LuluParser.ExprContext e:ctx.expr())
-            if(types.get(e)==null||types.get(e)!=LuluParser.INT_CONST){
-                hasError = true;
+        // Checking array indexing validation:
+        for(LuluParser.ExprContext e: ctx.expr())
+            if(types.get(e) == null || ! primMap.containsKey(types.get(e)) ||
+                    ! primMap.get(types.get(e)).convertable(primMap.get(LuluParser.INT_CONST))){
                 error("Invalid array indexing.", e.getStart());
+                return;
             }
-        if(hasError) return;
-        values.put(ctx, ctx.ID().getText());
+        // Refrence has array dimensions as it's value:
+        values.put(ctx, ctx.expr().size());
+        // Refrence can be array refrence or not:
         types.put(ctx, ctx.expr().isEmpty()?LuluTypeSystem.OBJECT:LuluTypeSystem.ARRAY);
     }
     
