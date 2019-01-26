@@ -331,8 +331,12 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void enterBlock(LuluParser.BlockContext ctx){
-        //TODO @hashemi check skip saving scope for if for and function 
-        saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
+        // Cheking wether block's symbol talbe is saved by block's parent or not:
+        if(!(ctx.getParent() instanceof LuluParser.WHILEContext) &&
+           !(ctx.getParent() instanceof LuluParser.FORContext) &&
+           !(ctx.getParent() instanceof LuluParser.IFContext && ctx.getParent().getChild(0).equals(ctx)) &&
+           !(ctx.getParent() instanceof LuluParser.Func_defContext))
+            saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
     }
     
     @Override
@@ -478,7 +482,29 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
        }
     }
     
-        @Override
+    @Override
+    public void exitIF(LuluParser.IFContext ctx){
+        // TODO @hashmei expr type checking
+    }
+    
+    @Override
+    public void exitCASE(LuluParser.CASEContext ctx){
+        // TODO @hashemi var type checking
+    }
+    
+    @Override
+    public void enterFOR(LuluParser.FORContext ctx){
+        // TODO @hashemi expr type checking
+        saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
+    }
+    
+    @Override
+    public void enterWHILE(LuluParser.WHILEContext ctx){
+        // TODO @hashemi expr type checking
+        saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
+    }
+    
+    @Override
     public void exitPRIM(LuluParser.PRIMContext ctx){
         Integer type = LuluTypeSystem.UNDEFINED;
         switch(ctx.PRIM_TYPE().getText()){
