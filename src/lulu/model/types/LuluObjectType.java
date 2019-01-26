@@ -68,5 +68,17 @@ public class LuluObjectType implements LuluType {
         if(data instanceof LuluSymbolTable)
             this.data = (LuluSymbolTable) data;
     }
+
+    @Override
+    public Integer getSize() {
+        return 4;
+    }
+    
+    @Override
+    public boolean equals(Object o){
+        if(o instanceof LuluObjectType)
+            return typeCode.equals(((LuluObjectType) o).getTypeCode());
+        return false;
+    }
     
 }
