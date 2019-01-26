@@ -12,44 +12,47 @@ import lulu.parser.LuluLexer;
  *
  * @author hashemi
  */
-public class LuluTypeSystem{
-    
+public class LuluTypeSystem {
+
     public static int UNDEFINED = -10;
     public static int FUNCTION = 100;
     public static int ARRAY = 101;
     public static int OBJECT = 102;
     public static String OBJECT_TAG = "object";
     private static int TYPE_COUNTER = 102;
-    
-    public static Integer getNextObjectTypeCode(){
+
+    public static Integer getNextObjectTypeCode() {
         return TYPE_COUNTER++;
     }
-    
-    public static Integer type(Integer operand, Integer operator){
-        switch(operator){
+
+    public static Integer type(Integer operand, Integer operator) {
+        switch (operator) {
             case LuluLexer.UNARY_OP:
-                if(operand==LuluLexer.BOOL_CONST||operand==LuluLexer.INT_CONST)
+                if (operand == LuluLexer.BOOL_CONST || operand == LuluLexer.INT_CONST) {
                     return LuluLexer.BOOL_CONST;
+                }
                 break;
             case LuluLexer.MINUS:
-                if(operand==LuluLexer.INT_CONST||operand==LuluLexer.REAL_CONST)
+                if (operand == LuluLexer.INT_CONST || operand == LuluLexer.REAL_CONST) {
                     return operand;
+                }
                 break;
             case LuluLexer.BITWISE_NOT:
-                if(operand==LuluLexer.BOOL_CONST||operand==LuluLexer.INT_CONST)
+                if (operand == LuluLexer.BOOL_CONST || operand == LuluLexer.INT_CONST) {
                     return LuluLexer.INT_CONST;
+                }
         }
         return UNDEFINED;
     }
-   
-    public static Integer type(Integer operand1, Integer operand2, Integer operator){
-        switch(operator){
+
+    public static Integer type(Integer operand1, Integer operand2, Integer operator) {
+        switch (operator) {
             case LuluLexer.ARIT_P1:
                 Integer t1 = type1(operand1, operand2);
-                return t1==UNDEFINED?type2(operand1, operand2):t1;
+                return t1 == UNDEFINED ? type2(operand1, operand2) : t1;
             case LuluLexer.ARIT_P2:
                 Integer t2 = type1(operand1, operand2);
-                return t2==UNDEFINED?type2(operand1, operand2):t2;
+                return t2 == UNDEFINED ? type2(operand1, operand2) : t2;
             case LuluLexer.BITWISE_AND:
                 return type2(operand1, operand2);
             case LuluLexer.BITWISE_OR:
@@ -63,100 +66,157 @@ public class LuluTypeSystem{
             case LuluLexer.REL:
                 Integer t3 = type4(operand1, operand2);
                 Integer t4 = type3(operand1, operand2);
-                return t3==UNDEFINED?(t4==UNDEFINED?type5(operand1,operand2):t4):t3;
+                return t3 == UNDEFINED ? (t4 == UNDEFINED ? type5(operand1, operand2) : t4) : t3;
             case LuluLexer.REL_EQ:
                 Integer t5 = type4(operand1, operand2);
                 Integer t6 = type3(operand1, operand2);
-                return t5==UNDEFINED?(t6==UNDEFINED?type5(operand1,operand2):t6):t5;
-                
+                return t5 == UNDEFINED ? (t6 == UNDEFINED ? type5(operand1, operand2) : t6) : t5;
+
         }
         return UNDEFINED;
     }
-    
-    private static Integer type1(Integer operand1, Integer operand2){
-        if(operand1==LuluLexer.REAL_CONST && (operand2==LuluLexer.BOOL_CONST||
-                                                      operand2==LuluLexer.INT_CONST||
-                                                      operand2==LuluLexer.REAL_CONST)||
-                   operand2==LuluLexer.REAL_CONST && (operand1==LuluLexer.BOOL_CONST||
-                                                      operand1==LuluLexer.INT_CONST)
-                   )return LuluLexer.REAL_CONST;
+
+    private static Integer type1(Integer operand1, Integer operand2) {
+        if (operand1 == LuluLexer.REAL_CONST && (operand2 == LuluLexer.BOOL_CONST
+                || operand2 == LuluLexer.INT_CONST
+                || operand2 == LuluLexer.REAL_CONST)
+                || operand2 == LuluLexer.REAL_CONST && (operand1 == LuluLexer.BOOL_CONST
+                || operand1 == LuluLexer.INT_CONST)) {
+            return LuluLexer.REAL_CONST;
+        }
         return UNDEFINED;
     }
-    
-    private static Integer type2(Integer operand1, Integer operand2){
-        if(operand1==LuluLexer.BOOL_CONST &&(operand2==LuluLexer.INT_CONST||
-                                                          operand2==LuluLexer.BOOL_CONST)||
-                        operand1==LuluLexer.INT_CONST && (operand2==LuluLexer.BOOL_CONST||
-                                                          operand2==LuluLexer.INT_CONST)
-                        )return LuluLexer.INT_CONST;
-        return UNDEFINED;                
+
+    private static Integer type2(Integer operand1, Integer operand2) {
+        if (operand1 == LuluLexer.BOOL_CONST && (operand2 == LuluLexer.INT_CONST
+                || operand2 == LuluLexer.BOOL_CONST)
+                || operand1 == LuluLexer.INT_CONST && (operand2 == LuluLexer.BOOL_CONST
+                || operand2 == LuluLexer.INT_CONST)) {
+            return LuluLexer.INT_CONST;
+        }
+        return UNDEFINED;
     }
-    
-    private static Integer type3(Integer operand1, Integer operand2){
-        if(operand1==LuluLexer.BOOL_CONST &&(operand2==LuluLexer.INT_CONST||
-                                                          operand2==LuluLexer.BOOL_CONST)||
-                        operand1==LuluLexer.INT_CONST && (operand2==LuluLexer.BOOL_CONST||
-                                                          operand2==LuluLexer.INT_CONST)
-                        )return LuluLexer.BOOL_CONST;
-        return UNDEFINED;                
+
+    private static Integer type3(Integer operand1, Integer operand2) {
+        if (operand1 == LuluLexer.BOOL_CONST && (operand2 == LuluLexer.INT_CONST
+                || operand2 == LuluLexer.BOOL_CONST)
+                || operand1 == LuluLexer.INT_CONST && (operand2 == LuluLexer.BOOL_CONST
+                || operand2 == LuluLexer.INT_CONST)) {
+            return LuluLexer.BOOL_CONST;
+        }
+        return UNDEFINED;
     }
-    
-    private static Integer type4(Integer operand1, Integer operand2){
-        if(operand1==LuluLexer.REAL_CONST && (operand2==LuluLexer.BOOL_CONST||
-                                                      operand2==LuluLexer.INT_CONST||
-                                                      operand2==LuluLexer.REAL_CONST)||
-                   operand2==LuluLexer.REAL_CONST && (operand1==LuluLexer.BOOL_CONST||
-                                                      operand1==LuluLexer.INT_CONST)
-                   )return LuluLexer.BOOL_CONST;
-        return UNDEFINED;               
+
+    private static Integer type4(Integer operand1, Integer operand2) {
+        if (operand1 == LuluLexer.REAL_CONST && (operand2 == LuluLexer.BOOL_CONST
+                || operand2 == LuluLexer.INT_CONST
+                || operand2 == LuluLexer.REAL_CONST)
+                || operand2 == LuluLexer.REAL_CONST && (operand1 == LuluLexer.BOOL_CONST
+                || operand1 == LuluLexer.INT_CONST)) {
+            return LuluLexer.BOOL_CONST;
+        }
+        return UNDEFINED;
     }
-    
-    private static Integer type5(Integer operand1, Integer operand2){
-        if(operand1==LuluLexer.STRING_CONST && (operand2==LuluLexer.BOOL_CONST||
-                                                      operand2==LuluLexer.STRING_CONST)||
-                   operand2==LuluLexer.STRING_CONST && operand1==LuluLexer.BOOL_CONST
-                   )return LuluLexer.BOOL_CONST;
-        return UNDEFINED;               
+
+    private static Integer type5(Integer operand1, Integer operand2) {
+        if (operand1 == LuluLexer.STRING_CONST && (operand2 == LuluLexer.BOOL_CONST
+                || operand2 == LuluLexer.STRING_CONST)
+                || operand2 == LuluLexer.STRING_CONST && operand1 == LuluLexer.BOOL_CONST) {
+            return LuluLexer.BOOL_CONST;
+        }
+        return UNDEFINED;
     }
-    
-    public static boolean convertable(Integer source, Integer destination){
-        switch(destination){
+
+    public static boolean convertable(Integer source, Integer destination) {
+        switch (destination) {
             case LuluLexer.REAL_CONST:
-                if(source==LuluLexer.REAL_CONST||source==LuluLexer.INT_CONST)
+                if (source == LuluLexer.REAL_CONST || source == LuluLexer.INT_CONST) {
                     return true;
+                }
                 break;
             case LuluLexer.INT_CONST:
-                if(source==LuluLexer.BOOL_CONST||source==LuluLexer.INT_CONST)
+                if (source == LuluLexer.BOOL_CONST || source == LuluLexer.INT_CONST) {
                     return true;
+                }
                 break;
             case LuluLexer.BOOL_CONST:
-                if(source==LuluLexer.BOOL_CONST||source==LuluLexer.INT_CONST)
+                if (source == LuluLexer.BOOL_CONST || source == LuluLexer.INT_CONST) {
                     return true;
+                }
                 break;
             case LuluLexer.STRING_CONST:
-                if(source==LuluLexer.STRING_CONST||source==LuluLexer.BOOL_CONST)
+                if (source == LuluLexer.STRING_CONST || source == LuluLexer.BOOL_CONST) {
                     return true;
-                    break;
+                }
+                break;
         }
         return false;
     }
-    
-    
-    public static boolean convertable(LuluObjectType source, LuluObjectType destination, 
-            Map<Integer, LuluObjectType> typeMap){
+
+    public static boolean convertable(LuluObjectType source, LuluObjectType destination,
+            Map<Integer, LuluObjectType> typeMap) {
         Integer tempTypeCode = source.getTypeCode();
-        while (!tempTypeCode.equals(OBJECT)){
-            if(tempTypeCode.equals(destination.getTypeCode()))
+        while (!tempTypeCode.equals(OBJECT)) {
+            if (tempTypeCode.equals(destination.getTypeCode())) {
                 return true;
+            }
             tempTypeCode = typeMap.get(tempTypeCode).getSuperTypeCode();
         }
         return false;
     }
-    
-    public static boolean convertable(LuluArrayType source, LuluArrayType destination){
-        
+
+    public static boolean convertable(LuluArrayType source, LuluArrayType destination,
+            Map<Integer, LuluObjectType> typeMap) {
+        if (source.getSizes().length == destination.getSizes().length) {
+            if (source.getElementTypeCode() < 100 && destination.getElementTypeCode() < 100) {
+                return convertable(source.getElementTypeCode(), destination.getElementTypeCode());
+            } else if (source.getElementTypeCode() > 100 && destination.getElementTypeCode() > 100) {
+                return convertable(typeMap.get(source.getElementTypeCode()),
+                        typeMap.get(destination.getElementTypeCode()),
+                        typeMap);
+            }
+        }
+        return false;
     }
-    
-    public static boolean convertable(LuluFunctionType source, LuluFunctionType destination)
-    
+
+    public static boolean convertable(LuluFunctionType source, LuluFunctionType destination,
+            Map<Integer, LuluObjectType> typeMap) {
+
+        if (source.inputTypes.size() != destination.inputTypes.size()) {
+            return false;
+        }
+        if (source.outputTypes.size() != destination.outputTypes.size()) {
+            return false;
+        }
+        for (int i = 0; i < source.inputTypes.size(); i++) {
+            if (source.inputTypes.get(i).getTypeCode()<100&&
+                    destination.inputTypes.get(i).getTypeCode()<100) {
+                if(!convertable(source.inputTypes.get(i).getTypeCode(),
+                        destination.inputTypes.get(i).getTypeCode()))
+                    return false;
+            }else if(source.inputTypes.get(i).getTypeCode()>=100&&
+                    destination.inputTypes.get(i).getTypeCode()>=100){
+                if(!convertable(typeMap.get(source.inputTypes.get(i).getTypeCode()),
+                        typeMap.get(destination.inputTypes.get(i).getTypeCode()),
+                        typeMap))
+                    return false;
+            }
+        }
+        for (int i = 0; i < source.outputTypes.size(); i++) {
+            if (source.outputTypes.get(i).getTypeCode()<100&&
+                    destination.outputTypes.get(i).getTypeCode()<100) {
+                if(!convertable(source.outputTypes.get(i).getTypeCode(),
+                        destination.outputTypes.get(i).getTypeCode()))
+                    return false;
+            }else if(source.outputTypes.get(i).getTypeCode()>=100&&
+                    destination.outputTypes.get(i).getTypeCode()>=100){
+                if(!convertable(typeMap.get(source.outputTypes.get(i).getTypeCode()),
+                        typeMap.get(destination.outputTypes.get(i).getTypeCode()),
+                        typeMap))
+                    return false;
+            }
+        }
+        return true;
+    }
+
 }

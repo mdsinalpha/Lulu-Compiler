@@ -73,7 +73,10 @@ public class LuluArrayType extends LuluType{
     
     //TODO convertable()
     public boolean convertable(Object o){
-        
+        if(o instanceof LuluArrayType)
+            if(LuluTypeSystem.convertable(this, (LuluArrayType)o, null)){
+                return true;
+            }
         return false;
     }
 }

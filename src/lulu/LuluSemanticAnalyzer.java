@@ -187,8 +187,9 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             return;
         }
         // Finally, this type should inherit another type!
-        tObject.setSuperTag(s.getText());
-        LuluSymbolTable tData = new LuluSymbolTable(t.getText(), (LuluSymbolTable) currentScope.resolve(s.getText()).getData());
+        LuluObjectType sObject = (LuluObjectType) currentScope.resolve(s.getText());
+        tObject.setSuperTypeCode(sObject.getTypeCode());
+        LuluSymbolTable tData = new LuluSymbolTable(t.getText(), (LuluSymbolTable) sObject.getData());
         tObject.setData(tData);
         tObject.define();
         currentTypeScope = tData;
@@ -356,7 +357,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
        }
        else if(t!=null&&t.getText().equals("super")){
            if(currentTypeScope==null||
-                   ((LuluObjectType)currentScope.resolve(currentTypeScope.getTag())).getSuperTag().equals(LuluTypeSystem.OBJECT_TAG)){
+                   ((LuluObjectType)currentScope.resolve(currentTypeScope.getTag())).getSuperTypeCode().equals(LuluTypeSystem.OBJECT)){
                error("Unresolved refrence to keyword 'super'.", t);
                return;
            }
