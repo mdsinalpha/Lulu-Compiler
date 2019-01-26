@@ -27,6 +27,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     //public Map<String, ArrayList<String>> codeMap;
     
+    public Map<Integer, LuluPrimitiveType> primMap;
     public Map<Integer, LuluObjectType> typeMap;
     
     public ArrayList<LuluError> errorList;
@@ -35,11 +36,12 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     private LuluSymbolTable currentScope;
     private LuluSymbolTable currentTypeScope;
      
-    private LuluLableGenerator lableGenerator;
+    private final LuluLableGenerator lableGenerator;
     //private LuluLableGenerator variableGenerator;
     
     private final ParseTreeProperty<Object> values;
     private final ParseTreeProperty<Integer> types;
+    private final ParseTreeProperty<ArrayList<LuluType>> argsTypes;
     //private ParseTreeProperty<String> variables;
     
     public static final String GLOBAL_TAG = "main";
@@ -49,6 +51,15 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public LuluSemanticAnalyzer(){
         //codeMap = new OrderedHashMap<>();
             
+        primMap = new HashMap<>();
+        primMap.put(LuluParser.INT_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
+                                        false, LuluParser.INT_CONST));
+        primMap.put(LuluParser.REAL_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
+                                        false, LuluParser.REAL_CONST));
+        primMap.put(LuluParser.BOOL_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
+                                        false, LuluParser.BOOL_CONST));
+        primMap.put(LuluParser.STRING_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
+                                        false, LuluParser.STRING_CONST));
         typeMap = new HashMap<>();
         
         errorList = new ArrayList<>();
@@ -60,6 +71,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         
         values = new ParseTreeProperty<>();
         types = new ParseTreeProperty<>();
+        argsTypes = new ParseTreeProperty<>();
         //variables = new ParseTreeProperty<>();
     }
      
@@ -113,10 +125,84 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         }
         releaseScope();
     }
+    
+    @Override
+    public void enterFunc_dcl(LuluParser.Func_dclContext ctx){
+        // Each function has input/output LuluType lists, making the lists ready for args/args_var:
+        ctx.args().forEach((arg) -> {
+            argsTypes.put(arg, new ArrayList<>());
+        });
+        if(ctx.args_var() != null)
+           argsTypes.put(ctx.args_var(), new ArrayList<>());
+        
+    }
 
     @Override
     public void exitFunc_dcl(LuluParser.Func_dclContext ctx){
-        //TODO @pooriazmn
+        // Declaring a function with given sinature:
+        Token t = ctx.ID().getSymbol();
+        ArrayList<LuluType> input = ctx.args(0)!=null?argsTypes.get(ctx.args(0)):new ArrayList<>();
+        ArrayList<LuluType> output = ctx.args(1)!=null?argsTypes.get(ctx.args(1)):new ArrayList<>();
+        LuluFunctionType fType = new LuluFunctionType(LuluType.aModifier.public_, 
+                ctx.getToken(7, 0)!=null, input, output);
+        LuluType tType = currentScope.resolve(t.getText());
+        if(tType != null && !(tType instanceof LuluFunctionType)){
+            // This ID is taken!
+            error(String.format("Function name %s is already taken by another field.", t.getText()), t);
+            return;
+        }
+        if(currentScope.resolvef(t.getText(), fType) != null){
+            // This function is declared once!
+            error(String.format("Function %s already declared.", t.getText()), t);
+            return;
+        }
+        currentScope.define(t.getText(), fType);
+    }
+    
+    @Override
+    public void enterArgs(LuluParser.ArgsContext ctx){
+        // Moving parent's LuluType list to child's context, so when args exits we can add a LuluType inside it!
+        ArrayList<LuluType> tArgsTypes = argsTypes.get(ctx.getParent());
+        if(tArgsTypes != null)
+            argsTypes.put(ctx, tArgsTypes);
+    }
+    
+    @Override
+    public void exitArgs(LuluParser.ArgsContext ctx){
+        // Counting brackets([) to determine array dimensions.
+        Integer brackets = ctx.getTokens(9).size();
+        if(brackets == 0){
+            // This is not an array!
+            Integer tCode = types.get(ctx.type());
+            argsTypes.get(ctx).add(primMap.containsKey(tCode)?primMap.get(tCode):typeMap.get(tCode));
+        }else{
+            LuluArrayType array = new LuluArrayType(LuluType.aModifier.public_, false, 
+                    types.get(ctx.type()), new Integer[brackets]);
+            argsTypes.get(ctx).add(array);
+        }
+    }
+    
+    @Override 
+    public void enterArgs_var(LuluParser.Args_varContext ctx){
+        // Moving parent's LuluType list to child's context, so when args exits we can add a LuluType inside it!
+        ArrayList<LuluType> tArgsTypes = argsTypes.get(ctx.getParent());
+        if(tArgsTypes != null)
+            argsTypes.put(ctx, tArgsTypes);
+    }
+    
+    @Override
+    public void exitArgs_var(LuluParser.Args_varContext ctx){
+        // Counting brackets([) to determine array dimensions.
+        Integer brackets = ctx.getTokens(9).size();
+        if(brackets == 0){
+            // This is not an array!
+            Integer tCode = types.get(ctx.type());
+            argsTypes.get(ctx).add(primMap.containsKey(tCode)?primMap.get(tCode):typeMap.get(tCode));
+        }else{
+            LuluArrayType array = new LuluArrayType(LuluType.aModifier.public_, false, 
+                    types.get(ctx.type()), new Integer[brackets]);
+            argsTypes.get(ctx).add(array);
+        }
     }
     
     @Override
@@ -129,8 +215,8 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             return;
         }
         else if(tType != null){
-            // This ID is taken by a variable!
-            error(String.format("Type name %s is already taken by a variable.", t.getText()), t);
+            // This ID is taken!
+            error(String.format("Type name %s is already taken by another field.", t.getText()), t);
         }
         // Declare a new type with given ID:
         LuluObjectType tObject = new LuluObjectType(t.getText());
@@ -155,8 +241,8 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             currentScope.define(t.getText(), tObject);
             typeMap.put(tObject.getTypeCode(), tObject);
         } else if(!(tType instanceof LuluObjectType)){
-            // This ID is taken by a variable!
-            error(String.format("Type name %s is already taken by a variable.", t.getText()), t);
+            // This ID is taken!
+            error(String.format("Type name %s is already taken by another field.", t.getText()), t);
             return;
         }
         else tObject = (LuluObjectType) tType;
@@ -182,8 +268,8 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             return;
         }
         else if(!(sType instanceof LuluObjectType)){
-            // This ID is taken by a variable!
-            error(String.format("Type name %s is already taken by a variable.", s.getText()), s);
+            // This ID is taken!
+            error(String.format("Type name %s is already taken by another field.", s.getText()), s);
             return;
         }
         // Finally, this type should inherit another type!
@@ -299,35 +385,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         types.put(ctx, rType);
     }
     
-    @Override
-    public void exitPRIM(LuluParser.PRIMContext ctx){
-        Integer value = LuluTypeSystem.UNDEFINED;
-        switch(ctx.PRIM_TYPE().getText()){
-            case "int":
-                value = LuluParser.INT_CONST;
-                break;
-            case "bool":
-                value = LuluParser.BOOL_CONST;
-                break;
-            case "float":
-                value = LuluParser.REAL_CONST;
-                break;
-            case "string":
-                value = LuluParser.STRING_CONST;
-        }
-        types.put(ctx, value);
-    }
-    
-    @Override
-    public void exitID(LuluParser.IDContext ctx){
-        Token t = ctx.ID().getSymbol();
-        LuluType tType = currentScope.resolve(t.getText());
-        if(tType == null || !(tType instanceof LuluObjectType)){
-            error(String.format("Type %s not declared.", t.getText()), t);
-            return;
-        }
-        types.put(ctx, tType.getTypeCode());
-    }
     
     @Override
     public void exitRef(LuluParser.RefContext ctx){
@@ -378,5 +435,40 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
            
            //varScope = typeScopes.get(((LuluObjectType)it).getTag());
        }
+    }
+    
+        @Override
+    public void exitPRIM(LuluParser.PRIMContext ctx){
+        Integer type = LuluTypeSystem.UNDEFINED;
+        switch(ctx.PRIM_TYPE().getText()){
+            case "int":
+                type = LuluParser.INT_CONST;
+                break;
+            case "bool":
+                type = LuluParser.BOOL_CONST;
+                break;
+            case "float":
+                type = LuluParser.REAL_CONST;
+                break;
+            case "string":
+                type = LuluParser.STRING_CONST;
+        }
+        types.put(ctx, type);
+    }
+    
+    @Override
+    public void exitID(LuluParser.IDContext ctx){
+        Token t = ctx.ID().getSymbol();
+        LuluType tType = currentScope.resolve(t.getText());
+        if(tType == null){
+            // Since we are sure this ID is not a PRIM keyword, null result of resolve means:
+            error(String.format("Type %s not declared.", t.getText()), t);
+            return;
+        }else if(!(tType instanceof LuluObjectType)){
+            // This ID is taken!
+            error(String.format("Type name %s is already taken by another field.", t.getText()), t);
+            return;
+        }
+        types.put(ctx, tType.getTypeCode());
     }
 }
