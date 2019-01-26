@@ -37,6 +37,10 @@ public class LuluArrayType extends LuluType{
         return elementTypeCode;
     }
     
+    public Integer[] getSizes(){
+        return sizes;
+    }
+    
     public Integer getLength(){
         return elements.length;
     }
@@ -69,6 +73,7 @@ public class LuluArrayType extends LuluType{
     
     //TODO convertable()
     public boolean convertable(Object o){
+        
         return false;
     }
 }

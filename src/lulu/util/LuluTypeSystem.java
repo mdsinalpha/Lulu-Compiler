@@ -2,6 +2,8 @@ package lulu.util;
 
 import java.util.Map;
 import lulu.model.LuluSymbolTable;
+import lulu.model.types.LuluArrayType;
+import lulu.model.types.LuluFunctionType;
 import lulu.model.types.LuluObjectType;
 import lulu.model.types.LuluPrimitiveType;
 import lulu.parser.LuluLexer;
@@ -141,15 +143,20 @@ public class LuluTypeSystem{
     
     
     public static boolean convertable(LuluObjectType source, LuluObjectType destination, 
-            Map<String, LuluObjectType> type){
-        String temp_tag = source.getTag();
-        while (!temp_tag.equals(OBJECT_TAG)){
-            if(temp_tag.equals(destination.getTag()))
+            Map<Integer, LuluObjectType> typeMap){
+        Integer tempTypeCode = source.getTypeCode();
+        while (!tempTypeCode.equals(OBJECT)){
+            if(tempTypeCode.equals(destination.getTypeCode()))
                 return true;
-            temp_tag = type.get(temp_tag).getSuperTag();
+            tempTypeCode = typeMap.get(tempTypeCode).getSuperTypeCode();
         }
         return false;
     }
     
+    public static boolean convertable(LuluArrayType source, LuluArrayType destination){
+        
+    }
+    
+    public static boolean convertable(LuluFunctionType source, LuluFunctionType destination)
     
 }
