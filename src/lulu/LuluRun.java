@@ -28,6 +28,7 @@ public class LuluRun {
             LuluParser parser = new LuluParser(new CommonTokenStream(lexer));
             ParseTreeWalker walker = new ParseTreeWalker();
             LuluSemanticAnalyzer loader = new LuluSemanticAnalyzer();
+            /*
             walker.walk(loader, parser.program());
             loader.codeMap.keySet().stream().map((tag) -> {
                 System.out.printf("%s:\n", tag);
@@ -36,7 +37,7 @@ public class LuluRun {
                 loader.codeMap.get(tag).forEach((code) -> {
                     System.out.println(code);
                  });
-            }); /*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
+            }); *//*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
             File output = new File(args[1]);
             FileWriter writer = new FileWriter(output);
             while(generator.hasNextLine())

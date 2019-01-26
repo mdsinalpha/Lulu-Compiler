@@ -54,5 +54,9 @@ public class LuluSymbolTable{
    public void define(String id, LuluType type){
        table.map(id, type);
    }
+      
+   public Integer getSize(){
+        return 10 + (parent!=null?parent.getSize():0) + table.values().stream().mapToInt(LuluType::getSize).sum();
+   }
     
 }
