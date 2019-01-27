@@ -2,6 +2,7 @@ package lulu;
 
 
 import java.util.*;
+import lulu.model.LuluEntry;
 
 import lulu.model.LuluSymbolTable;
 import lulu.model.types.LuluArrayType;
@@ -15,7 +16,6 @@ import lulu.parser.LuluParser;
 import lulu.util.LuluError;
 import lulu.util.LuluLableGenerator;
 import lulu.util.LuluTypeSystem;
-import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
@@ -41,11 +41,11 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     //private LuluLableGenerator variableGenerator;
     
     private final ParseTreeProperty<Object> values;
-    private final ParseTreeProperty<Integer> types;
+    private final ParseTreeProperty<LuluType> types;
     private final ParseTreeProperty<ArrayList<LuluType>> argsTypes;
     //private ParseTreeProperty<String> variables;
     
-    public static final String GLOBAL_TAG = "main";
+    public static final String GLOBAL_TAG = "global";
     public static final String MAIN_TAG = "start";
     
     
@@ -53,14 +53,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         //codeMap = new OrderedHashMap<>();
             
         primMap = new HashMap<>();
-        primMap.put(LuluParser.INT_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
-                                        false, LuluParser.INT_CONST));
-        primMap.put(LuluParser.REAL_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
-                                        false, LuluParser.REAL_CONST));
-        primMap.put(LuluParser.BOOL_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
-                                        false, LuluParser.BOOL_CONST));
-        primMap.put(LuluParser.STRING_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
-                                        false, LuluParser.STRING_CONST));
+        primMap.put(LuluParser.INT_CONST, new LuluPrimitiveType(LuluParser.INT_CONST));
+        primMap.put(LuluParser.REAL_CONST, new LuluPrimitiveType(LuluParser.REAL_CONST));
+        primMap.put(LuluParser.BOOL_CONST, new LuluPrimitiveType(LuluParser.BOOL_CONST));
+        primMap.put(LuluParser.STRING_CONST, new LuluPrimitiveType(LuluParser.STRING_CONST));
         typeMap = new HashMap<>();
         
         errorList = new ArrayList<>();
@@ -95,7 +91,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     private void releaseScope(){
         // Exiting an scope.
-        currentScope = currentScope.getParent();
+        LuluSymbolTable parent = currentScope.getParent();
+        if(parent != null)
+            parent.increaseOffset(currentScope.getSize());
+        currentScope = parent;
     }
         
     @Override
@@ -103,9 +102,9 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         // Program needs a root scope for globals:
         saveScope(ctx, new LuluSymbolTable(GLOBAL_TAG));
         // Type 'object' is reserved by Lulu compiler:)
-        LuluObjectType object = new LuluObjectType(LuluTypeSystem.OBJECT_TAG);
+        LuluEntry object = new LuluEntry(LuluEntry.aModifier.private_, true, 
+            new LuluPrimitiveType(LuluTypeSystem.OBJECT), new Object(), 4);
         currentScope.define(LuluTypeSystem.OBJECT_TAG, object);
-        typeMap.put(LuluTypeSystem.OBJECT, object);
     }
     
     @Override
@@ -116,11 +115,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         }
         //DONE @hashemi Check wether start function is defined.
         ArrayList<LuluType> out = new ArrayList<>();
-        out.add(new LuluPrimitiveType(LuluType.aModifier.public_, false, LuluParser.INT_CONST));
-        LuluFunctionType start = new LuluFunctionType(LuluType.aModifier.public_,
-                false, new ArrayList<>(), out);
-        LuluType tType = currentScope.resolvef(MAIN_TAG, start);
-        if(tType == null){
+        out.add(new LuluPrimitiveType(LuluParser.INT_CONST));
+        LuluFunctionType start = new LuluFunctionType(false, new ArrayList<>(), out);
+        LuluEntry entry = currentScope.resolvef(MAIN_TAG, start);
+        if(entry == null){
             error("Expecting start function definition.", ctx.getStop());
             return;
         }
@@ -144,10 +142,9 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         Token t = ctx.ID().getSymbol();
         ArrayList<LuluType> input = ctx.args(0)!=null?argsTypes.get(ctx.args(0)):new ArrayList<>();
         ArrayList<LuluType> output = ctx.args(1)!=null?argsTypes.get(ctx.args(1)):new ArrayList<>();
-        LuluFunctionType fType = new LuluFunctionType(LuluType.aModifier.public_, 
-                ctx.getToken(7, 0)!=null, input, output);
-        LuluType tType = currentScope.resolve(t.getText());
-        if(tType != null && !(tType instanceof LuluFunctionType)){
+        LuluFunctionType fType = new LuluFunctionType(ctx.getToken(7, 0)!=null, input, output);
+        LuluEntry entry = currentScope.resolve(t.getText());
+        if(entry != null && !(entry.getType() instanceof LuluFunctionType)){
             // This ID is taken!
             error(String.format("Function name %s is already taken by another field.", t.getText()), t);
             return;
@@ -157,9 +154,11 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             error(String.format("Function %s already declared.", t.getText()), t);
             return;
         }
-        currentScope.define(t.getText(), fType);
+        entry = new LuluEntry(LuluEntry.aModifier.public_, false, fType);
+        currentScope.define(t.getText(), entry);
     }
     
+    /*
     @Override
     public void enterArgs(LuluParser.ArgsContext ctx){
         // Moving parent's LuluType list to child's context, so when args exits we can add a LuluType inside it!
@@ -731,4 +730,5 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         }
         types.put(ctx, tType.getTypeCode());
     }
+    */
 }
