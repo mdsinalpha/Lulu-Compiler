@@ -1,5 +1,6 @@
 package lulu;
 
+
 import java.util.*;
 
 import lulu.model.LuluSymbolTable;
@@ -484,18 +485,43 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitIF(LuluParser.IFContext ctx){
-        // TODO @hashmei expr type checking
+        // DONE @hashmei expr type checking
+        if(!primMap.containsKey(types.get(ctx.expr()))){
+            error(String.format("can not evaluate %s to boolean.",ctx.expr().getText()),
+                    ctx.expr().getStart());
+        }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
+            error(String.format("can not evaluate %s to boolean.",ctx.expr().getText()),
+                    ctx.expr().getStart());
+        }
+                
     }
     
     @Override
     public void exitCASE(LuluParser.CASEContext ctx){
-        // TODO @hashemi var type checking
+        // DONE @hashemi var type checking
+        if(!primMap.containsKey(types.get(ctx.var()))){
+            error(String.format("can not evaluate %s to boolean.",ctx.var().getText()),
+                    ctx.var().getStart());
+        }else if(!primMap.get(types.get(ctx.var())).convertable(LuluLexer.INT_CONST)){
+            error(String.format("can not evaluate %s to boolean.",ctx.var().getText()),
+                    ctx.var().getStart());
+        }
     }
     
     @Override
     public void enterFOR(LuluParser.FORContext ctx){
-        // TODO @hashemi expr type checking
         saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
+    }
+    
+    @Override
+    public void exitFOR(LuluParser.FORContext ctx){
+        if(!primMap.containsKey(types.get(ctx.expr()))){
+            error(String.format("can not evaluate %s to boolean.",ctx.expr().getText()),
+                    ctx.expr().getStart());
+        }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
+            error(String.format("can not evaluate %s to boolean.",ctx.expr().getText()),
+                    ctx.expr().getStart());
+        }
     }
     
     @Override
