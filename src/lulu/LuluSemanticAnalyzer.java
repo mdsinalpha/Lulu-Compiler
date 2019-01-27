@@ -345,45 +345,32 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         releaseScope();
     }
 
+        
     @Override
     public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
         types.put(ctx, types.get(ctx.expr()));
     }
     
-    
     @Override
-    public void exitCONST(LuluParser.CONSTContext ctx){
-        types.put(ctx, types.get(ctx.const_val()));
-    }
-    
-    @Override 
-    public void exitINT(LuluParser.INTContext ctx){
-        String text = ctx.INT_CONST().getText();
-        Integer value;
-        if(text.length()>2&&text.substring(0, 2).toLowerCase().equals("0x"))
-            value = Integer.parseInt(text.substring(2), 16);
-        else value = Integer.parseInt(text);
-        values.put(ctx, value);
-        types.put(ctx, LuluLexer.INT_CONST);
+    public void exitUNARY_OP(LuluParser.UNARY_OPContext ctx){
+        Token operation = ctx.UNARY_OP().getSymbol();
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr()), operation.getType());
+        if(rType== LuluTypeSystem.UNDEFINED) {
+            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            return;
+        }
+        types.put(ctx, rType);
     }
     
     @Override
-    public void exitREAL(LuluParser.REALContext ctx){
-        //TODO @mdsinalpha Implement hex real
-        values.put(ctx, Double.parseDouble(ctx.REAL_CONST().getText()));
-        types.put(ctx, LuluLexer.REAL_CONST);
-    }
-    
-    @Override
-    public void exitBOOL(LuluParser.BOOLContext ctx){
-        values.put(ctx, ctx.BOOL_CONST().getText().equals("true"));
-        types.put(ctx, LuluParser.BOOL_CONST);  
-    }
-    
-    @Override
-    public void exitSTRING(LuluParser.STRINGContext ctx){
-        values.put(ctx, ctx.STRING_CONST().getText());
-        types.put(ctx, LuluParser.STRING_CONST);
+    public void exitBITWISE_NOT(LuluParser.BITWISE_NOTContext ctx){
+        Token operation = ctx.BITWISE_NOT().getSymbol();
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr()), operation.getType());
+        if(rType== LuluTypeSystem.UNDEFINED) {
+            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            return;
+        }
+        types.put(ctx, rType);
     }
     
     @Override 
@@ -522,6 +509,36 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     }
     
     @Override
+    public void exitALLOCATION(LuluParser.ALLOCATIONContext ctx){
+        types.put(ctx, types.get(ctx.handle_call()));
+    }
+    
+    @Override
+    public void exitFUNCTION(LuluParser.FUNCTIONContext ctx){
+        types.put(ctx, types.get(ctx.func_call()));
+    }
+    
+    @Override
+    public void exitVARC(LuluParser.VARCContext ctx){
+        types.put(ctx, types.get(ctx.var()));
+    }
+    
+    @Override
+    public void exitLISTC(LuluParser.LISTCContext ctx){
+        types.put(ctx, types.get(ctx.list()));
+    }
+    
+    @Override
+    public void exitNIL(LuluParser.NILContext ctx){
+        types.put(ctx, LuluTypeSystem.NIL);
+    }
+    
+    @Override
+    public void exitCONST(LuluParser.CONSTContext ctx){
+        types.put(ctx, types.get(ctx.const_val()));
+    }
+    
+    @Override
     public void exitRef(LuluParser.RefContext ctx){
         // Checking array indexing validation:
         for(LuluParser.ExprContext e: ctx.expr())
@@ -582,8 +599,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
             error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
-        }
-                
+        }    
     }
     
     @Override
@@ -612,12 +628,73 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
         }
+        //TODO @hashemi type assign 
     }
     
     @Override
     public void enterWHILE(LuluParser.WHILEContext ctx){
-        // TODO @hashemi expr type checking
         saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
+    }
+    
+    @Override
+    public void exitWHILE(LuluParser.WHILEContext ctx){
+        if(!primMap.containsKey(types.get(ctx.expr()))){
+            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
+                    ctx.expr().getStart());
+        }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
+            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
+                    ctx.expr().getStart());
+        }
+    }
+    
+    @Override
+    public void enterHandle_call(LuluParser.Handle_callContext ctx){
+        argsTypes.put(ctx, new ArrayList<>());
+    }
+    
+    @Override
+    public void exitHandle_call(LuluParser.Handle_callContext ctx){
+        Collections.reverse(argsTypes.get(ctx));
+    }
+    
+    @Override
+    public void enterParams(LuluParser.ParamsContext ctx){
+        argsTypes.put(ctx, argsTypes.get(ctx.getParent()));
+    }
+    
+    @Override
+    public void exitParams(LuluParser.ParamsContext ctx){
+       // TODO
+       // argsTypes.get(ctx).add(e);
+    }
+    
+    @Override 
+    public void exitINT(LuluParser.INTContext ctx){
+        String text = ctx.INT_CONST().getText();
+        Integer value;
+        if(text.length()>2&&text.substring(0, 2).toLowerCase().equals("0x"))
+            value = Integer.parseInt(text.substring(2), 16);
+        else value = Integer.parseInt(text);
+        values.put(ctx, value);
+        types.put(ctx, LuluLexer.INT_CONST);
+    }
+    
+    @Override
+    public void exitREAL(LuluParser.REALContext ctx){
+        values.put(ctx, Double.parseDouble(ctx.REAL_CONST().getText()));
+        types.put(ctx, LuluLexer.REAL_CONST);
+    }
+    
+    @Override
+    public void exitBOOL(LuluParser.BOOLContext ctx){
+        values.put(ctx, ctx.BOOL_CONST().getText().equals("true"));
+        types.put(ctx, LuluParser.BOOL_CONST);  
+    }
+    
+    @Override
+    public void exitSTRING(LuluParser.STRINGContext ctx){
+        values.put(ctx, ctx.STRING_CONST().getText());
+        types.put(ctx, LuluParser.STRING_CONST);
     }
     
     @Override

@@ -15,6 +15,8 @@ import lulu.parser.LuluLexer;
 public class LuluTypeSystem {
 
     public static int UNDEFINED = -10;
+    public static int NIL = 99;
+    public static String NIL_TAG = "nil";
     public static int FUNCTION = 100;
     public static int ARRAY = 101;
     public static int OBJECT = 102;
