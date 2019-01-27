@@ -430,6 +430,96 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         types.put(ctx, rType);
     }
     
+    @Override
+    public void exitBITWISE_AND(LuluParser.BITWISE_ANDContext ctx){
+        Token operation = ctx.BITWISE_AND().getSymbol();
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitBITWISE_XOR(LuluParser.BITWISE_XORContext ctx){
+        Token operation = ctx.BITWISE_XOR().getSymbol();
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitBITWISE_OR(LuluParser.BITWISE_ORContext ctx){
+        Token operation = ctx.BITWISE_OR().getSymbol();
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitREL(LuluParser.RELContext ctx){
+        Token operation = ctx.REL().getSymbol();
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitREL_EQ(LuluParser.REL_EQContext ctx){
+        Token operation = ctx.REL_EQ().getSymbol();
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }       
+    
+    @Override
+    public void exitLOGICAL_AND(LuluParser.LOGICAL_ANDContext ctx){
+        Token operation = ctx.LOGICAL_AND().getSymbol();
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitLOGICAL_OR(LuluParser.LOGICAL_ORContext ctx){
+        Token operation = ctx.LOGICAL_OR().getSymbol();
+        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
     
     @Override
     public void exitRef(LuluParser.RefContext ctx){
@@ -487,10 +577,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public void exitIF(LuluParser.IFContext ctx){
         // DONE @hashmei expr type checking
         if(!primMap.containsKey(types.get(ctx.expr()))){
-            error(String.format("can not evaluate %s to boolean.",ctx.expr().getText()),
+            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
         }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
-            error(String.format("can not evaluate %s to boolean.",ctx.expr().getText()),
+            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
         }
                 
@@ -500,10 +590,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public void exitCASE(LuluParser.CASEContext ctx){
         // DONE @hashemi var type checking
         if(!primMap.containsKey(types.get(ctx.var()))){
-            error(String.format("can not evaluate %s to boolean.",ctx.var().getText()),
+            error(String.format("Can not evaluate %s to boolean.",ctx.var().getText()),
                     ctx.var().getStart());
         }else if(!primMap.get(types.get(ctx.var())).convertable(LuluLexer.INT_CONST)){
-            error(String.format("can not evaluate %s to boolean.",ctx.var().getText()),
+            error(String.format("Can not evaluate %s to boolean.",ctx.var().getText()),
                     ctx.var().getStart());
         }
     }
@@ -516,10 +606,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override
     public void exitFOR(LuluParser.FORContext ctx){
         if(!primMap.containsKey(types.get(ctx.expr()))){
-            error(String.format("can not evaluate %s to boolean.",ctx.expr().getText()),
+            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
         }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
-            error(String.format("can not evaluate %s to boolean.",ctx.expr().getText()),
+            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
         }
     }
