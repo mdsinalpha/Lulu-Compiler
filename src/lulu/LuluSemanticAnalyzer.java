@@ -31,6 +31,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     public static LuluSymbolTable currentScope;
     private LuluSymbolTable currentTypeScope;
+    private LuluSymbolTable lastReleasedScope;
     
     private final ParseTreeProperty<LuluSymbolTable> scopes;
     private final ParseTreeProperty<Object> values;
@@ -329,6 +330,68 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         values.put(ctx, ctx.expr().size());
     }
     
+    @Override 
+    public void enterType_def(LuluParser.Type_defContext ctx){
+        Token t = ctx.ID(0).getSymbol();
+        LuluEntry entry = currentScope.resolve(t.getText());
+        if(entry == null){
+            // This type is not declared but also only defined!
+            entry = new LuluEntry(t.getText(), LuluEntry.aModifier.public_,
+                        true, new LuluObjectType(t.getText()));
+        } else if(!(entry.getType() instanceof LuluObjectType)){
+            // This ID is taken!
+            error(String.format("Type name %s is already taken by another field.", t.getText()), t);
+            return;
+        } else if(entry.getType().isDefined()){
+            // This type is defined once!
+            error(String.format("Type %s already defined.", t.getText()), t);
+            return;
+        }
+        if(ctx.ID(1)==null){
+            // There is no super class definition for this definition:)
+            LuluSymbolTable tData = new LuluSymbolTable(t.getText(), LuluSymbolTable.stType.type);
+            entry.setData(tData);
+            ((LuluObjectType)entry.getType()).define();
+            currentScope.define(t.getText(), entry);
+            currentTypeScope = tData;
+            saveScope(ctx, tData);
+            return;
+        }
+        
+        Token s = ctx.ID(1).getSymbol();
+        LuluEntry superEntry = currentScope.resolve(s.getText());
+        if(superEntry == null){
+            // Super type not found!
+            error(String.format("Type %s not declared.", s.getText()), s);
+            return;
+        }
+        else if(!(superEntry.getType() instanceof LuluObjectType)){
+            // This ID is taken!
+            error(String.format("Super name %s must be a type.", s.getText()), s);
+            return;
+        }else if(!superEntry.getType().isDefined()){
+            // Super type is not defined yet.
+            error(String.format("Super type %s must be defined before using an inheritance relation.",
+                    s.getText()), s);
+            return;
+        }
+        // Finally, this type should inherit another type!
+        LuluSymbolTable tData = new LuluSymbolTable(t.getText(), LuluSymbolTable.stType.type,
+                (LuluSymbolTable)superEntry.getData());
+        entry.setData(tData);
+        ((LuluObjectType)entry.getType()).setSuperType(superEntry.getType());
+        ((LuluObjectType)entry.getType()).define();
+        currentScope.define(t.getText(), entry);
+        currentTypeScope = tData;
+        saveScope(ctx, tData);
+    }
+    
+    @Override
+    public void exitType_def(LuluParser.Type_defContext ctx){
+        releaseScope();
+        currentTypeScope = null;
+    }
+    
     @Override
     public void enterFunc_def(LuluParser.Func_defContext ctx){
         // Define a function inside current scope's symbol table:
@@ -337,13 +400,15 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             error("Access modifiers are only allowed inside a type block.", ctx.ACCSSMOD().getSymbol());
             return;
         }
-        saveScope(ctx, new LuluSymbolTable(ctx.ID().getText(), LuluSymbolTable.stType.function));
+        ctx.args_var().forEach(args -> {argsTypes.put(args, new ArrayList<>());
+                                        argsIDs.put(args, new ArrayList<>());});
+        saveScope(ctx, new LuluSymbolTable(
+                (currentTypeScope!=null?currentTypeScope.getTag()+"_":"")+
+                        ctx.ID().getText(), LuluSymbolTable.stType.function));
     }
     
     @Override
     public void exitFunc_def(LuluParser.Func_defContext ctx){
-        LuluSymbolTable temp = currentScope;
-        releaseScope();
         Token t = ctx.ID().getSymbol();
         if(currentScope.has(t.getText())){
             // This ID is taken!
@@ -387,9 +452,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
                     tAM = LuluEntry.aModifier.public_;
                     break;
            }
-           entry = new LuluEntry(t.getText(), tAM, false, fType);
+           entry = new LuluEntry(t.getText(), tAM, true, fType);
+           ((LuluFunctionType)entry.getType()).define();
         }
-        entry.setData(temp);
+        entry.setData(lastReleasedScope);
         currentScope.define(t.getText(), entry);
     }
     
@@ -405,72 +471,23 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitBlock(LuluParser.BlockContext ctx){
+        lastReleasedScope = currentScope;
         releaseScope();
-    }
-    
-    
-    /*
-    @Override 
-    public void enterType_def(LuluParser.Type_defContext ctx){
-        Token t = ctx.ID(0).getSymbol();
-        LuluType tType = currentScope.resolve(t.getText());
-        LuluObjectType tObject;
-        if(tType == null){
-            // This type is not declared but also only defined!
-            tObject = new LuluObjectType(t.getText());
-            currentScope.define(t.getText(), tObject);
-            typeMap.put(tObject.getTypeCode(), tObject);
-        } else if(!(tType instanceof LuluObjectType)){
-            // This ID is taken!
-            error(String.format("Type name %s is already taken by another field.", t.getText()), t);
-            return;
-        }
-        else tObject = (LuluObjectType) tType;
-        if(tObject.isDefined()){
-            // This type is defined once!
-            error(String.format("Type %s already defined.", t.getText()), t);
-            return;
-        }
-        if(ctx.ID(1)==null){
-            // There is no super class definition for this definition:)
-            LuluSymbolTable tData = new LuluSymbolTable(t.getText(), currentScope);
-            tObject.setData(tData);
-            tObject.define();
-            currentTypeScope = tData;
-            saveScope(ctx, tData);
-            return;
-        }
-        Token s = ctx.ID(1).getSymbol();
-        LuluType sType = currentScope.resolve(s.getText());
-        if(sType == null){
-            // Super type not found!
-            error(String.format("Type %s not declared.", s.getText()), s);
-            return;
-        }
-        else if(!(sType instanceof LuluObjectType)){
-            // This ID is taken!
-            error(String.format("Type name %s is already taken by another field.", s.getText()), s);
-            return;
-        }
-        // Finally, this type should inherit another type!
-        LuluObjectType sObject = (LuluObjectType) currentScope.resolve(s.getText());
-        tObject.setSuperTypeCode(sObject.getTypeCode());
-        LuluSymbolTable tData = new LuluSymbolTable(t.getText(), (LuluSymbolTable) sObject.getData());
-        tObject.setData(tData);
-        tObject.define();
-        currentTypeScope = tData;
-        saveScope(ctx, tData);
     }
     
     @Override
-    public void exitType_def(LuluParser.Type_defContext ctx){
-        releaseScope();
-        currentTypeScope = null;
+    public void exitAssign(LuluParser.AssignContext ctx){
+        if(ctx.var().size()==1){
+            if(!types.get(ctx.expr()).convertable(ctx.var(0))){
+                error(String.format("Cannot assign %s to %s.", ctx.expr().getText(),
+                            ctx.var(0).getText()), ctx.getToken(6, 0).getSymbol());
+                return;
+            }
+        }
     }
-     
+      
     @Override
     public void exitVar(LuluParser.VarContext ctx){
-       //TODO @hashemi
        LuluSymbolTable varScope = currentScope;
        Token t = ctx.getStart();
        if(t!=null&&t.getText().equals("this")){
@@ -481,30 +498,51 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
            varScope = currentTypeScope;
        }
        else if(t!=null&&t.getText().equals("super")){
-           if(currentTypeScope==null||
-                   ((LuluObjectType)currentScope.resolve(currentTypeScope.getTag())).getSuperTypeCode().equals(LuluTypeSystem.OBJECT)){
+           if(currentTypeScope==null||currentTypeScope.getParent()==null){
                error("Unresolved refrence to keyword 'super'.", t);
                return;
            }
            varScope = currentTypeScope.getParent();
        }
-       
-       LuluType it = null;
-       for(LuluParser.RefContext r:ctx.ref()){
-           String id = values.get(r).toString();
-           it = varScope.resolve(id);
-           if(it==null){
-               error(String.format("Undefined field %s inside type %s.", id, varScope.getTag()), r.getStart());
+       Token r = ctx.ref(0).ID().getSymbol();
+       LuluEntry entry = null;
+       LuluType entry_t = null;
+       for(LuluParser.RefContext ref:ctx.ref()){
+           if (varScope == null){
+                error(String.format("Cannot access a field of %s since it is not a type", r.getText()), r);
+                return;
+           }
+           r = ref.ID().getSymbol();
+           entry = varScope.resolve(r.getText());
+           if(entry == null){
+               error(String.format("Unresolved refrence %s", r.getText()), r);
                return;
            }
-           if(it instanceof LuluArrayType){
-               
+           if((Integer) values.get(ref) > 0){
+               if(!(entry.getType() instanceof LuluArrayType)){
+                   error("[] not expected.", r);
+                   return;
+               }
+               else if(!((LuluArrayType)entry.getType()).getDimensions().equals(values.get(ref))){
+                   error("Incorrect number of dimensions.", r);
+                   return;
+               }else{
+                   entry_t = ((LuluArrayType) entry.getType()).getElementType();
+               }
+           }else{
+               entry_t = entry.getType();
            }
-           
-           //varScope = typeScopes.get(((LuluObjectType)it).getTag());
+           if(entry_t instanceof LuluObjectType){
+               varScope = (LuluSymbolTable) entry.getData();
+           }else{
+               varScope = null;
+           }
        }
+       types.put(ctx, entry_t);
+       values.put(ctx, entry);
     }
     
+    /*
     @Override
     public void exitIF(LuluParser.IFContext ctx){
         // DONE @hashmei expr type checking

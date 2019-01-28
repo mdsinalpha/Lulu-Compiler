@@ -34,6 +34,7 @@ public class LuluObjectType implements LuluType {
         return tag;
     }
     
+    // TODO
     public void setSuperType(LuluType superType){
         this.superType = superType;
     }
