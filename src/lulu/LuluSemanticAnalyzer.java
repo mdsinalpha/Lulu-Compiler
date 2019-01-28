@@ -38,6 +38,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     private final ParseTreeProperty<ArrayList<String>> argsIDs;
     private final ParseTreeProperty<ArrayList<LuluType>> argsTypes;
     
+    private final LuluLableGenerator tagGenerator;
     
     public static final String GLOBAL_TAG = "global";
     public static final String MAIN_TAG = "start";
@@ -51,6 +52,8 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         types = new ParseTreeProperty<>();
         argsIDs = new ParseTreeProperty<>();
         argsTypes = new ParseTreeProperty<>();
+        
+        tagGenerator = new LuluLableGenerator("S");
     }
      
    
@@ -226,6 +229,21 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             argsTypes.get(ctx).add(types.get(ctx.type()));
         }
         argsIDs.get(ctx).add(ctx.ID().getText());
+        
+        // TODO Comment
+        if(ctx.getParent() instanceof LuluParser.Func_defContext){
+            for(int i=0;i<argsTypes.get(ctx).size();i++){
+                if(!currentScope.has(argsIDs.get(ctx).get(i))){
+                    String ID = argsIDs.get(ctx).get(i);
+                    currentScope.define(ID, 
+                            new LuluEntry(ID, LuluEntry.aModifier.public_,
+                                false, argsTypes.get(ctx).get(i)));
+                }else{
+                    error("Duplicate variable name in function definition.", ctx.getStart());
+                    return;
+                }
+            }
+        }
     }
     
     @Override
@@ -248,7 +266,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         currentScope.define(t.getText(), entry);
     }
     
-    /*
     @Override
     public void exitVar_def(LuluParser.Var_defContext ctx){
         // Define a variable inside current scope's symbol table:
@@ -257,21 +274,21 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             error("Access modifiers are only allowed inside a type block.", ctx.ACCSSMOD().getSymbol());
             return;
         }
-        LuluType.aModifier tAM = LuluType.aModifier.public_;
+        LuluEntry.aModifier tAM = LuluEntry.aModifier.public_;
         if(ctx.ACCSSMOD() != null)
             switch(ctx.ACCSSMOD().getText()){
                 case "private":
-                    tAM = LuluType.aModifier.private_;
+                    tAM = LuluEntry.aModifier.private_;
                     break;
                 case "protected":
-                    tAM = LuluType.aModifier.protected_;
+                    tAM = LuluEntry.aModifier.protected_;
                     break;
                 case "public":
-                    tAM = LuluType.aModifier.public_;
+                    tAM = LuluEntry.aModifier.public_;
                     break;
         }
         boolean tConst = ctx.getToken(12, 0) != null;
-        Integer tCode = types.get(ctx.type());
+        LuluType tType = types.get(ctx.type());
         for(LuluParser.Var_valContext v: ctx.var_val()){
             Token tID = v.ref().ID().getSymbol();
             if(currentScope.has(tID.getText())){
@@ -279,22 +296,120 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
                 error(String.format("Variable name %s is already taken by another field.", tID.getText()), tID);
                 return;
             }
-            LuluType tType;
-            if(types.get(v) == LuluTypeSystem.ARRAY)
-                tType = new LuluArrayType(tAM, tConst, tCode, new Integer[(Integer)values.get(v)]);
-            else if(primMap.containsKey(tCode))
-                tType = new LuluPrimitiveType(tAM, tConst, tCode);
-            //TODO @mdsinalpha check here!
-            else tType = new LuluObjectType(typeMap.get(tCode).getTag());
-            //TODO Type checking:
+            Integer dimensions = (Integer) values.get(v.ref());
+            if(dimensions != 0)
+                tType = new LuluArrayType(tType, dimensions);
             if(v.expr() != null){
-                
+                LuluType expType = types.get(v.expr());
+                if(!expType.convertable(tType)){
+                    // Auto cast error in auto cast assignment.
+                    error(String.format("Cannot auto cast %s to %s.", expType, tType), 
+                            v.getToken(6, 0).getSymbol());
+                    return;
+                }
             }
-            currentScope.define(tID.getText(), tType);
+            currentScope.define(tID.getText(), 
+                    new LuluEntry(tID.getText(), tAM, tConst, tType));
+            // TODO Put const data inside 
+            // TODO Move size to LuluType
+            // TODO Make a new type class
+            // TODO Allocation is not allowed inside declare
         }
     }
     
+    @Override
+    public void exitRef(LuluParser.RefContext ctx){
+        // Checking array indexing validation:
+        for(LuluParser.ExprContext exp: ctx.expr())
+            if(types.get(exp).convertable(new LuluPrimitiveType(LuluParser.INT_CONST))){
+                error("Invalid array indexing.", exp.getStart());
+                return;
+            }
+        // Refrence can be array refrence or not:
+        values.put(ctx, ctx.expr().size());
+    }
     
+    @Override
+    public void enterFunc_def(LuluParser.Func_defContext ctx){
+        // Define a function inside current scope's symbol table:
+        if(!(ctx.getParent() instanceof LuluParser.Type_defContext) &&
+                ctx.ACCSSMOD() != null){
+            error("Access modifiers are only allowed inside a type block.", ctx.ACCSSMOD().getSymbol());
+            return;
+        }
+        saveScope(ctx, new LuluSymbolTable(ctx.ID().getText(), LuluSymbolTable.stType.function));
+    }
+    
+    @Override
+    public void exitFunc_def(LuluParser.Func_defContext ctx){
+        LuluSymbolTable temp = currentScope;
+        releaseScope();
+        Token t = ctx.ID().getSymbol();
+        if(currentScope.has(t.getText())){
+            // This ID is taken!
+            error(String.format("Function name %s is already taken by another field.", t.getText()), t);
+            return;
+        }
+        ArrayList<LuluType> output = new ArrayList<>();
+        ArrayList<LuluType> input = new ArrayList<>();
+        if(ctx.args_var().size() == 2){
+            output = argsTypes.get(ctx.args_var(0));
+            input = argsTypes.get(ctx.args_var(1));
+        }else if(!ctx.args_var().isEmpty()){
+            if(ctx.args_var(0).getStart().getCharPositionInLine() 
+                    < t.getCharPositionInLine())
+                output = argsTypes.get(ctx.args_var(0));
+            else input = argsTypes.get(ctx.args_var(0));
+                
+        }
+        LuluFunctionType fType = new LuluFunctionType(false, input, output);
+        LuluEntry entry;
+        if(currentScope.hasf(t.getText(), fType)){
+            entry = currentScope.resolvef(t.getText(), fType);
+            if(!entry.getType().isDefined()){
+                // This function is defined once!
+                error(String.format("Function %s already defined.", t.getText()), t);
+                return;
+            }
+            ((LuluFunctionType)entry.getType()).define();
+        }
+        else{
+            LuluEntry.aModifier tAM = LuluEntry.aModifier.public_;
+            if(ctx.ACCSSMOD() != null)
+            switch(ctx.ACCSSMOD().getText()){
+                case "private":
+                    tAM = LuluEntry.aModifier.private_;
+                    break;
+                case "protected":
+                    tAM = LuluEntry.aModifier.protected_;
+                    break;
+                case "public":
+                    tAM = LuluEntry.aModifier.public_;
+                    break;
+           }
+           entry = new LuluEntry(t.getText(), tAM, false, fType);
+        }
+        entry.setData(temp);
+        currentScope.define(t.getText(), entry);
+    }
+    
+    @Override
+    public void enterBlock(LuluParser.BlockContext ctx){
+        // Cheking wether block's symbol talbe is saved by block's parent or not:
+        if(!(ctx.getParent() instanceof LuluParser.WHILEContext) &&
+           !(ctx.getParent() instanceof LuluParser.FORContext) &&
+           !(ctx.getParent() instanceof LuluParser.IFContext && ctx.getParent().getChild(0).equals(ctx)) &&
+           !(ctx.getParent() instanceof LuluParser.Func_defContext))
+            saveScope(ctx, new LuluSymbolTable(tagGenerator.getNextLable()));
+    }
+    
+    @Override
+    public void exitBlock(LuluParser.BlockContext ctx){
+        releaseScope();
+    }
+    
+    
+    /*
     @Override 
     public void enterType_def(LuluParser.Type_defContext ctx){
         Token t = ctx.ID(0).getSymbol();
@@ -352,38 +467,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         releaseScope();
         currentTypeScope = null;
     }
-    
-    
-    @Override
-    public void enterBlock(LuluParser.BlockContext ctx){
-        // Cheking wether block's symbol talbe is saved by block's parent or not:
-        if(!(ctx.getParent() instanceof LuluParser.WHILEContext) &&
-           !(ctx.getParent() instanceof LuluParser.FORContext) &&
-           !(ctx.getParent() instanceof LuluParser.IFContext && ctx.getParent().getChild(0).equals(ctx)) &&
-           !(ctx.getParent() instanceof LuluParser.Func_defContext))
-            saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
-    }
-    
-    @Override
-    public void exitBlock(LuluParser.BlockContext ctx){
-        releaseScope();
-    }
-
-    @Override
-    public void exitRef(LuluParser.RefContext ctx){
-        // Checking array indexing validation:
-        for(LuluParser.ExprContext e: ctx.expr())
-            if(types.get(e) == null || ! primMap.containsKey(types.get(e)) ||
-                    ! primMap.get(types.get(e)).convertable(primMap.get(LuluParser.INT_CONST))){
-                error("Invalid array indexing.", e.getStart());
-                return;
-            }
-        // Refrence has array dimensions as it's value:
-        values.put(ctx, ctx.expr().size());
-        // Refrence can be array refrence or not:
-        types.put(ctx, ctx.expr().isEmpty()?LuluTypeSystem.OBJECT:LuluTypeSystem.ARRAY);
-    }
-    
+     
     @Override
     public void exitVar(LuluParser.VarContext ctx){
        //TODO @hashemi

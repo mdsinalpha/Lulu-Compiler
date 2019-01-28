@@ -67,7 +67,7 @@ public class LuluObjectType implements LuluType {
     
     @Override
     public String toString(){
-        return tag;
+        return "LuluType";
     }
     
 }
