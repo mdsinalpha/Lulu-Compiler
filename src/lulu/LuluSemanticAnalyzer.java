@@ -26,9 +26,7 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  * @author mdsinalpha
  */
 public class LuluSemanticAnalyzer extends LuluBaseListener {
-    
-    public Map<Integer, LuluObjectType> typeMap;
-    
+        
     public ArrayList<LuluError> errorList;
     
     public static LuluSymbolTable currentScope;
@@ -45,9 +43,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public static final String MAIN_TAG = "start";
     
     
-    public LuluSemanticAnalyzer(){            
-        typeMap = new HashMap<>();
-        
+    public LuluSemanticAnalyzer(){                    
         errorList = new ArrayList<>();
                
         scopes = new ParseTreeProperty<>();
@@ -149,9 +145,24 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public void exitFunc_dcl(LuluParser.Func_dclContext ctx){
         // Declaring a function with given signature:
         Token t = ctx.ID().getSymbol();
-        ArrayList<LuluType> output = ctx.args(1)!=null?argsTypes.get(ctx.args(1)):new ArrayList<>();
-        ArrayList<LuluType> input = ctx.args(0)!=null?argsTypes.get(ctx.args(0)):new ArrayList<>();
-        input = ctx.args_var()!=null?argsTypes.get(ctx.args_var()):input;
+        ArrayList<LuluType> output = new ArrayList<>();
+        ArrayList<LuluType> input = new ArrayList<>();
+        if(ctx.args_var() != null){
+            if(ctx.args(0) != null)
+                output = argsTypes.get(ctx.args(0));
+            input = argsTypes.get(ctx.args_var());
+        }
+        else{
+            if(ctx.args().size() == 2){
+                output = argsTypes.get(ctx.args(0));
+                input = argsTypes.get(ctx.args(1));
+            }
+            else if(!ctx.args().isEmpty()){
+                if(ctx.args(0).getStart().getCharPositionInLine() < t.getCharPositionInLine())
+                    output = argsTypes.get(ctx.args(0));
+                else input = argsTypes.get(ctx.args(0));
+            }
+        }
         LuluFunctionType fType = new LuluFunctionType(ctx.getToken(7, 0)!=null, input, output);
         
         if(currentScope.hasf(t.getText(), fType)){
@@ -217,27 +228,27 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         argsIDs.get(ctx).add(ctx.ID().getText());
     }
     
-    /*
-    
     @Override
     public void exitType_dcl(LuluParser.Type_dclContext ctx){
         Token t = ctx.ID().getSymbol();
-        LuluType tType = currentScope.resolve(t.getText());
-        if(tType != null && tType instanceof LuluObjectType){
+        LuluEntry entry = currentScope.resolve(t.getText());
+        if(entry != null && entry.getType() instanceof LuluObjectType){
             // This type is declared once!
             error(String.format("Type %s already declared.", t.getText()), t);
             return;
         }
-        else if(tType != null){
+        else if(entry != null){
             // This ID is taken!
             error(String.format("Type name %s is already taken by another field.", t.getText()), t);
+            return;
         }
         // Declare a new type with given ID:
-        LuluObjectType tObject = new LuluObjectType(t.getText());
-        currentScope.define(t.getText(), tObject);
-        typeMap.put(tObject.getTypeCode(), tObject);
+        entry = new LuluEntry(t.getText(), LuluEntry.aModifier.public_, 
+                true, new LuluObjectType(t.getText()));
+        currentScope.define(t.getText(), entry);
     }
     
+    /*
     @Override
     public void exitVar_def(LuluParser.Var_defContext ctx){
         // Define a variable inside current scope's symbol table:
