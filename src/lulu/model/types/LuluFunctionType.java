@@ -7,7 +7,7 @@ import lulu.util.LuluTypeSystem;
  *
  * @author mdsinalpha
  */
-public class LuluFunctionType extends LuluType {
+public class LuluFunctionType implements LuluType {
     
     private final boolean isNative;
     
@@ -16,9 +16,8 @@ public class LuluFunctionType extends LuluType {
     
     private boolean defined;
     
-    public LuluFunctionType(aModifier accessModifier, boolean isNative,
+    public LuluFunctionType(boolean isNative,
             ArrayList<LuluType> inputTypes, ArrayList<LuluType> outputTypes){
-        super(accessModifier, false);
         this.isNative = isNative;
         this.inputTypes = inputTypes;
         this.outputTypes = outputTypes;
@@ -29,12 +28,7 @@ public class LuluFunctionType extends LuluType {
     public Integer getTypeCode() {
         return LuluTypeSystem.FUNCTION;
     } 
-    
-    @Override
-    public Integer getSize() {
-        return 4;
-    }
-    
+        
     public boolean isNative(){
         return isNative;
     }
@@ -51,10 +45,13 @@ public class LuluFunctionType extends LuluType {
     @Override
     public boolean convertable(Object o){
         if(o instanceof LuluFunctionType)
-            if(LuluTypeSystem.convertable(this, (LuluFunctionType)o, null))//TODO
-                return true;
-        
+            return LuluTypeSystem.convertable(this, (LuluFunctionType)o);
         return false;
+    }
+    
+    @Override
+    public String toString(){
+        return inputTypes.toString() + " -> " + outputTypes.toString();
     }
     
 }

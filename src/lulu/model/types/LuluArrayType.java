@@ -6,21 +6,14 @@ import lulu.util.LuluTypeSystem;
  *
  * @author hashemi
  */
-public class LuluArrayType extends LuluType{
+public class LuluArrayType implements LuluType{
     
-    private final Integer elementTypeCode;
-    private final Integer[] sizes;
-    private final Object[] elements;
+    private final LuluType elementType;
+    private final Integer dimensions;
     
-    public LuluArrayType(aModifier accessModifier, boolean isConst,
-            Integer elementTypeCode, Integer[] sizes){
-        super(accessModifier, isConst);
-        this.elementTypeCode = elementTypeCode;
-        this.sizes = sizes;
-        Integer size = sizes[0];
-        for(int i=1;i<sizes.length;i++)
-            size *= sizes[i];
-        elements = new Object[size];
+    public LuluArrayType(LuluType elementType, Integer dimensions){
+        this.elementType = elementType;
+        this.dimensions = dimensions;
     }
     
     @Override
@@ -28,23 +21,40 @@ public class LuluArrayType extends LuluType{
         return LuluTypeSystem.ARRAY;
     }
     
+    public LuluType getElementType(){
+        return elementType;
+    }
+    
+    public Integer getDimensions(){
+        return dimensions;
+    }
+    
     @Override
-    public Integer getSize(){
-        return 4;
+    public boolean isDefined(){
+        return true;
     }
     
-    public Integer getElementTypeCode(){
-        return elementTypeCode;
+    @Override
+    public boolean convertable(Object o){
+        if(o instanceof LuluArrayType)
+            return LuluTypeSystem.convertable(this, (LuluArrayType)o);
+        return false;
     }
     
-    public Integer[] getSizes(){
-        return sizes;
+    @Override
+    public boolean equals(Object o){
+        if(o instanceof LuluArrayType)
+            return dimensions.equals(((LuluArrayType) o).dimensions) &&
+                    elementType.equals(((LuluArrayType) o).getElementType());
+        return false;
     }
     
-    public Integer getLength(){
-        return elements.length;
+    @Override
+    public String toString(){
+        return String.format("ARRAY(%d, %s)", dimensions, elementType.toString());
     }
     
+    /*
     private Integer index(Integer [] dimensions){
         Integer index = 0;
         Integer c =1;
@@ -56,27 +66,5 @@ public class LuluArrayType extends LuluType{
             index+=c;
         }
         return index;
-    }
-    
-    public void setElement(Integer [] dimensions, Object datum){
-        elements[index(dimensions)] = datum;
-    }
-    
-    public Object getElement(Integer [] dimensions){
-        return elements[index(dimensions)];
-    }
-    
-    @Override
-    public boolean isDefined(){
-        return true;
-    }
-    
-    //TODO convertable()
-    public boolean convertable(Object o){
-        if(o instanceof LuluArrayType)
-            if(LuluTypeSystem.convertable(this, (LuluArrayType)o, null))//TODO
-                return true;
-            
-        return false;
-    }
+    }*/
 }

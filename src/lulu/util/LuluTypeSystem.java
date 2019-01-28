@@ -1,11 +1,10 @@
 package lulu.util;
 
-import java.util.Map;
-import lulu.model.LuluSymbolTable;
 import lulu.model.types.LuluArrayType;
 import lulu.model.types.LuluFunctionType;
 import lulu.model.types.LuluObjectType;
 import lulu.model.types.LuluPrimitiveType;
+import lulu.model.types.LuluType;
 import lulu.parser.LuluLexer;
 
 /**
@@ -15,6 +14,8 @@ import lulu.parser.LuluLexer;
 public class LuluTypeSystem {
 
     public static int UNDEFINED = -10;
+    public static int NIL = 99;
+    public static String NIL_TAG = "nil";
     public static int FUNCTION = 100;
     public static int ARRAY = 101;
     public static int OBJECT = 102;
@@ -23,6 +24,14 @@ public class LuluTypeSystem {
 
     public static Integer getNextObjectTypeCode() {
         return TYPE_COUNTER++;
+    }
+    
+    public static LuluType type(LuluType operand, Integer operator){
+        return new LuluPrimitiveType(type(operand.getTypeCode(), operator));
+    }
+    
+    public static LuluType type(LuluType operand1, LuluType operand2, Integer operator){
+        return new LuluPrimitiveType(type(operand1.getTypeCode(), operand2.getTypeCode(), operator));
     }
 
     public static Integer type(Integer operand, Integer operator) {
@@ -126,6 +135,10 @@ public class LuluTypeSystem {
         }
         return UNDEFINED;
     }
+    
+    public static boolean convertable(LuluPrimitiveType source, LuluPrimitiveType destination){
+        return convertable(source.getTypeCode(), destination.getTypeCode());
+    }
 
     public static boolean convertable(Integer source, Integer destination) {
         switch (destination) {
@@ -153,35 +166,25 @@ public class LuluTypeSystem {
         return false;
     }
 
-    public static boolean convertable(LuluObjectType source, LuluObjectType destination,
-            Map<Integer, LuluObjectType> typeMap) {
-        Integer tempTypeCode = source.getTypeCode();
-        while (!tempTypeCode.equals(OBJECT)) {
-            if (tempTypeCode.equals(destination.getTypeCode())) {
+    public static boolean convertable(LuluObjectType source, LuluObjectType destination) {
+        LuluObjectType temp = source;
+        while (!temp.getTypeCode().equals(OBJECT)) {
+            if (temp.getTypeCode().equals(destination.getTypeCode())) {
                 return true;
             }
-            tempTypeCode = typeMap.get(tempTypeCode).getSuperTypeCode();
+            temp = (LuluObjectType) temp.getSuperType();
         }
         return false;
     }
 
-    public static boolean convertable(LuluArrayType source, LuluArrayType destination,
-            Map<Integer, LuluObjectType> typeMap) {
-        if (source.getSizes().length == destination.getSizes().length) {
-            if (source.getElementTypeCode() < 100 && destination.getElementTypeCode() < 100) {
-                return convertable(source.getElementTypeCode(), destination.getElementTypeCode());
-            } else if (source.getElementTypeCode() > 100 && destination.getElementTypeCode() > 100) {
-                return convertable(typeMap.get(source.getElementTypeCode()),
-                        typeMap.get(destination.getElementTypeCode()),
-                        typeMap);
-            }
+    public static boolean convertable(LuluArrayType source, LuluArrayType destination) {
+        if (source.getDimensions().equals(destination.getDimensions())) {
+                return source.convertable(destination);
         }
         return false;
     }
 
-    public static boolean convertable(LuluFunctionType source, LuluFunctionType destination,
-            Map<Integer, LuluObjectType> typeMap) {
-
+    public static boolean convertable(LuluFunctionType source, LuluFunctionType destination){
         if (source.inputTypes.size() != destination.inputTypes.size()) {
             return false;
         }
@@ -189,32 +192,12 @@ public class LuluTypeSystem {
             return false;
         }
         for (int i = 0; i < source.inputTypes.size(); i++) {
-            if (source.inputTypes.get(i).getTypeCode()<100&&
-                    destination.inputTypes.get(i).getTypeCode()<100) {
-                if(!convertable(source.inputTypes.get(i).getTypeCode(),
-                        destination.inputTypes.get(i).getTypeCode()))
+                if(!source.inputTypes.get(i).convertable(destination.inputTypes.get(i)))
                     return false;
-            }else if(source.inputTypes.get(i).getTypeCode()>=100&&
-                    destination.inputTypes.get(i).getTypeCode()>=100){
-                if(!convertable(typeMap.get(source.inputTypes.get(i).getTypeCode()),
-                        typeMap.get(destination.inputTypes.get(i).getTypeCode()),
-                        typeMap))
-                    return false;
-            }
         }
         for (int i = 0; i < source.outputTypes.size(); i++) {
-            if (source.outputTypes.get(i).getTypeCode()<100&&
-                    destination.outputTypes.get(i).getTypeCode()<100) {
-                if(!convertable(source.outputTypes.get(i).getTypeCode(),
-                        destination.outputTypes.get(i).getTypeCode()))
+                if(!source.outputTypes.get(i).convertable(destination.outputTypes.get(i)))
                     return false;
-            }else if(source.outputTypes.get(i).getTypeCode()>=100&&
-                    destination.outputTypes.get(i).getTypeCode()>=100){
-                if(!convertable(typeMap.get(source.outputTypes.get(i).getTypeCode()),
-                        typeMap.get(destination.outputTypes.get(i).getTypeCode()),
-                        typeMap))
-                    return false;
-            }
         }
         return true;
     }

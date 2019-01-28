@@ -2,20 +2,20 @@ package lulu;
 
 
 import java.util.*;
+import javafx.scene.control.TreeItem;
+import lulu.gui.LuluRun;
+import lulu.model.LuluEntry;
 
 import lulu.model.LuluSymbolTable;
-import lulu.model.types.LuluArrayType;
 import lulu.model.types.LuluFunctionType;
 import lulu.model.types.LuluObjectType;
 import lulu.model.types.LuluPrimitiveType;
 import lulu.model.types.LuluType;
 import lulu.parser.LuluBaseListener;
-import lulu.parser.LuluLexer;
 import lulu.parser.LuluParser;
 import lulu.util.LuluError;
 import lulu.util.LuluLableGenerator;
 import lulu.util.LuluTypeSystem;
-import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
@@ -26,60 +26,46 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  */
 public class LuluSemanticAnalyzer extends LuluBaseListener {
     
-    //public Map<String, ArrayList<String>> codeMap;
     
     public Map<Integer, LuluPrimitiveType> primMap;
     public Map<Integer, LuluObjectType> typeMap;
     
     public ArrayList<LuluError> errorList;
     
-    private final ParseTreeProperty<LuluSymbolTable> scopes;
-    private LuluSymbolTable currentScope;
+    public static LuluSymbolTable currentScope;
     private LuluSymbolTable currentTypeScope;
      
     private final LuluLableGenerator lableGenerator;
-    //private LuluLableGenerator variableGenerator;
     
+    private final ParseTreeProperty<LuluSymbolTable> scopes;
     private final ParseTreeProperty<Object> values;
-    private final ParseTreeProperty<Integer> types;
+    private final ParseTreeProperty<LuluType> types;
     private final ParseTreeProperty<ArrayList<LuluType>> argsTypes;
-    //private ParseTreeProperty<String> variables;
     
-    public static final String GLOBAL_TAG = "main";
+    
+    public static final String GLOBAL_TAG = "global";
     public static final String MAIN_TAG = "start";
     
     
-    public LuluSemanticAnalyzer(){
-        //codeMap = new OrderedHashMap<>();
-            
+    public LuluSemanticAnalyzer(){            
         primMap = new HashMap<>();
-        primMap.put(LuluParser.INT_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
-                                        false, LuluParser.INT_CONST));
-        primMap.put(LuluParser.REAL_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
-                                        false, LuluParser.REAL_CONST));
-        primMap.put(LuluParser.BOOL_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
-                                        false, LuluParser.BOOL_CONST));
-        primMap.put(LuluParser.STRING_CONST, new LuluPrimitiveType(LuluType.aModifier.public_,
-                                        false, LuluParser.STRING_CONST));
+        primMap.put(LuluParser.INT_CONST, new LuluPrimitiveType(LuluParser.INT_CONST));
+        primMap.put(LuluParser.REAL_CONST, new LuluPrimitiveType(LuluParser.REAL_CONST));
+        primMap.put(LuluParser.BOOL_CONST, new LuluPrimitiveType(LuluParser.BOOL_CONST));
+        primMap.put(LuluParser.STRING_CONST, new LuluPrimitiveType(LuluParser.STRING_CONST));
         typeMap = new HashMap<>();
         
         errorList = new ArrayList<>();
         
-        scopes = new ParseTreeProperty<>();
-        
         lableGenerator = new LuluLableGenerator("L");
-        //variableGenerator = new LuluLableGenerator("T");    
         
+        scopes = new ParseTreeProperty<>();
         values = new ParseTreeProperty<>();
         types = new ParseTreeProperty<>();
         argsTypes = new ParseTreeProperty<>();
-        //variables = new ParseTreeProperty<>();
     }
      
-    /*
-    private void generateCode(String tCode){
-        codeMap.get(currentScope.getTag()).add(tCode);
-    }*/
+   
     
     private void error(String message, Token token){
         // Adding an error with it's occurence position inside list of compile errors:
@@ -89,23 +75,50 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     private void saveScope(ParserRuleContext ctx, LuluSymbolTable scope){
         // Entering an scope.
         currentScope = scope;
-        scopes.put(ctx, currentScope);
-        //codeMap.put(currentScope.getTag(), new ArrayList<>());
+        scopes.put(ctx, scope);
+        
+        // Maintain gui tree:
+        TreeItem currentTreeItem = new TreeItem(currentScope.toString());
+        LuluRun.scopeDataMap.put(currentTreeItem, currentScope.getTable());
+        LuluRun.rootItem.getChildren().add(currentTreeItem);
+        LuluRun.rootItem = currentTreeItem;
     }
     
     private void releaseScope(){
         // Exiting an scope.
-        currentScope = currentScope.getParent();
+        LuluSymbolTable parent = currentScope.getParent();
+        if(parent != null)
+            parent.increaseOffset(currentScope.getSize());
+        currentScope = parent;
+        
+        // Maintain gui tree:
+        LuluRun.rootItem = LuluRun.rootItem.getParent();
+    }
+    
+    public LuluSymbolTable getScope(ParserRuleContext ctx){
+        return scopes.get(ctx);
     }
         
     @Override
     public void enterProgram(LuluParser.ProgramContext ctx){
         // Program needs a root scope for globals:
         saveScope(ctx, new LuluSymbolTable(GLOBAL_TAG));
+        
+        /** TEST
+        saveScope(new LuluSymbolTable(MAIN_TAG, LuluSymbolTable.stType.loop));
+        currentScope.define("average", new LuluEntry("average", LuluEntry.aModifier.public_, true, 
+            new LuluArrayType(new LuluPrimitiveType(LuluParser.REAL_CONST), 5), 17.95, 40));
+        releaseScope();
+      
+        saveScope(new LuluSymbolTable("animal", LuluSymbolTable.stType.type));
+        saveScope(new LuluSymbolTable("getSound", LuluSymbolTable.stType.conditional));
+        releaseScope();
+        releaseScope();*/
+       
         // Type 'object' is reserved by Lulu compiler:)
-        LuluObjectType object = new LuluObjectType(LuluTypeSystem.OBJECT_TAG);
+        LuluEntry object = new LuluEntry(LuluTypeSystem.OBJECT_TAG, 
+                LuluEntry.aModifier.private_, true, new LuluPrimitiveType(LuluTypeSystem.OBJECT), new Object(), 4);
         currentScope.define(LuluTypeSystem.OBJECT_TAG, object);
-        typeMap.put(LuluTypeSystem.OBJECT, object);
     }
     
     @Override
@@ -116,17 +129,17 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         }
         //DONE @hashemi Check wether start function is defined.
         ArrayList<LuluType> out = new ArrayList<>();
-        out.add(new LuluPrimitiveType(LuluType.aModifier.public_, false, LuluParser.INT_CONST));
-        LuluFunctionType start = new LuluFunctionType(LuluType.aModifier.public_,
-                false, new ArrayList<>(), out);
-        LuluType tType = currentScope.resolvef(MAIN_TAG, start);
-        if(tType == null){
+        out.add(new LuluPrimitiveType(LuluParser.INT_CONST));
+        LuluFunctionType start = new LuluFunctionType(false, new ArrayList<>(), out);
+        LuluEntry entry = currentScope.resolvef(MAIN_TAG, start);
+        if(entry == null){
             error("Expecting start function definition.", ctx.getStop());
             return;
         }
         releaseScope();
     }
     
+    /*
     @Override
     public void enterFunc_dcl(LuluParser.Func_dclContext ctx){
         // Each function has input/output LuluType lists, making the lists ready for args/args_var:
@@ -134,8 +147,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             argsTypes.put(arg, new ArrayList<>());
         });
         if(ctx.args_var() != null)
-           argsTypes.put(ctx.args_var(), new ArrayList<>());
-        
+           argsTypes.put(ctx.args_var(), new ArrayList<>());        
     }
 
     @Override
@@ -144,10 +156,9 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         Token t = ctx.ID().getSymbol();
         ArrayList<LuluType> input = ctx.args(0)!=null?argsTypes.get(ctx.args(0)):new ArrayList<>();
         ArrayList<LuluType> output = ctx.args(1)!=null?argsTypes.get(ctx.args(1)):new ArrayList<>();
-        LuluFunctionType fType = new LuluFunctionType(LuluType.aModifier.public_, 
-                ctx.getToken(7, 0)!=null, input, output);
-        LuluType tType = currentScope.resolve(t.getText());
-        if(tType != null && !(tType instanceof LuluFunctionType)){
+        LuluFunctionType fType = new LuluFunctionType(ctx.getToken(7, 0)!=null, input, output);
+        LuluEntry entry = currentScope.resolve(t.getText());
+        if(entry != null && !(entry.getType() instanceof LuluFunctionType)){
             // This ID is taken!
             error(String.format("Function name %s is already taken by another field.", t.getText()), t);
             return;
@@ -157,8 +168,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             error(String.format("Function %s already declared.", t.getText()), t);
             return;
         }
-        currentScope.define(t.getText(), fType);
+        entry = new LuluEntry(t.getText(), LuluEntry.aModifier.public_, false, fType);
+        currentScope.define(t.getText(), entry);
     }
+    
     
     @Override
     public void enterArgs(LuluParser.ArgsContext ctx){
@@ -346,182 +359,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     }
 
     @Override
-    public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
-        types.put(ctx, types.get(ctx.expr()));
-    }
-    
-    
-    @Override
-    public void exitCONST(LuluParser.CONSTContext ctx){
-        types.put(ctx, types.get(ctx.const_val()));
-    }
-    
-    @Override 
-    public void exitINT(LuluParser.INTContext ctx){
-        String text = ctx.INT_CONST().getText();
-        Integer value;
-        if(text.length()>2&&text.substring(0, 2).toLowerCase().equals("0x"))
-            value = Integer.parseInt(text.substring(2), 16);
-        else value = Integer.parseInt(text);
-        values.put(ctx, value);
-        types.put(ctx, LuluLexer.INT_CONST);
-    }
-    
-    @Override
-    public void exitREAL(LuluParser.REALContext ctx){
-        //TODO @mdsinalpha Implement hex real
-        values.put(ctx, Double.parseDouble(ctx.REAL_CONST().getText()));
-        types.put(ctx, LuluLexer.REAL_CONST);
-    }
-    
-    @Override
-    public void exitBOOL(LuluParser.BOOLContext ctx){
-        values.put(ctx, ctx.BOOL_CONST().getText().equals("true"));
-        types.put(ctx, LuluParser.BOOL_CONST);  
-    }
-    
-    @Override
-    public void exitSTRING(LuluParser.STRINGContext ctx){
-        values.put(ctx, ctx.STRING_CONST().getText());
-        types.put(ctx, LuluParser.STRING_CONST);
-    }
-    
-    @Override 
-    public void exitARIT_P1(LuluParser.ARIT_P1Context ctx){
-        Token operation = ctx.ARIT_P1().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-
-    @Override
-    public void exitARIT_P2(LuluParser.ARIT_P2Context ctx){
-        Token operation = ctx.ARIT_P2().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-            error(String.format("Incompatible types on operation %s.",
-                    operation.getText()), operation);
-            return;
-        }
-        types.put(ctx, rType);
-    }
-
-    @Override
-    public void exitMINUS(LuluParser.MINUSContext ctx){
-        Token operation = ctx.MINUS().getSymbol();
-        int expr_count = ctx.expr().size();
-        Integer rType;
-        if (expr_count == 1){
-            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), operation.getType());
-        }else {
-            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)),
-                    operation.getType());
-        }
-        if(rType== LuluTypeSystem.UNDEFINED) {
-            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
-            return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitBITWISE_AND(LuluParser.BITWISE_ANDContext ctx){
-        Token operation = ctx.BITWISE_AND().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitBITWISE_XOR(LuluParser.BITWISE_XORContext ctx){
-        Token operation = ctx.BITWISE_XOR().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitBITWISE_OR(LuluParser.BITWISE_ORContext ctx){
-        Token operation = ctx.BITWISE_OR().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitREL(LuluParser.RELContext ctx){
-        Token operation = ctx.REL().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitREL_EQ(LuluParser.REL_EQContext ctx){
-        Token operation = ctx.REL_EQ().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }       
-    
-    @Override
-    public void exitLOGICAL_AND(LuluParser.LOGICAL_ANDContext ctx){
-        Token operation = ctx.LOGICAL_AND().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitLOGICAL_OR(LuluParser.LOGICAL_ORContext ctx){
-        Token operation = ctx.LOGICAL_OR().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
     public void exitRef(LuluParser.RefContext ctx){
         // Checking array indexing validation:
         for(LuluParser.ExprContext e: ctx.expr())
@@ -582,8 +419,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
             error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
-        }
-                
+        }    
     }
     
     @Override
@@ -612,13 +448,274 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
         }
+        //TODO @hashemi type assign 
     }
     
     @Override
     public void enterWHILE(LuluParser.WHILEContext ctx){
-        // TODO @hashemi expr type checking
         saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
     }
+    
+    @Override
+    public void exitWHILE(LuluParser.WHILEContext ctx){
+        if(!primMap.containsKey(types.get(ctx.expr()))){
+            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
+                    ctx.expr().getStart());
+        }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
+            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
+                    ctx.expr().getStart());
+        }
+    }
+    
+    @Override
+    public void enterHandle_call(LuluParser.Handle_callContext ctx){
+        argsTypes.put(ctx, new ArrayList<>());
+    }
+    
+    @Override
+    public void exitHandle_call(LuluParser.Handle_callContext ctx){
+        Collections.reverse(argsTypes.get(ctx));
+    }
+    
+    @Override
+    public void enterParams(LuluParser.ParamsContext ctx){
+        argsTypes.put(ctx, argsTypes.get(ctx.getParent()));
+    }
+    
+    @Override
+    public void exitParams(LuluParser.ParamsContext ctx){
+       // TODO
+       // argsTypes.get(ctx).add(e);
+    }
+*/
+    @Override
+    public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
+        types.put(ctx, types.get(ctx.expr()));
+    }
+    
+    @Override
+    public void exitUNARY_OP(LuluParser.UNARY_OPContext ctx){
+        Token operation = ctx.UNARY_OP().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr()), operation.getType());
+        if(rType.getTypeCode()== LuluTypeSystem.UNDEFINED) {
+            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitBITWISE_NOT(LuluParser.BITWISE_NOTContext ctx){
+        Token operation = ctx.BITWISE_NOT().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr()), operation.getType());
+        if(rType.getTypeCode()== LuluTypeSystem.UNDEFINED) {
+            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override 
+    public void exitARIT_P1(LuluParser.ARIT_P1Context ctx){
+        Token operation = ctx.ARIT_P1().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+
+    @Override
+    public void exitARIT_P2(LuluParser.ARIT_P2Context ctx){
+        Token operation = ctx.ARIT_P2().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+            error(String.format("Incompatible types on operation %s.",
+                    operation.getText()), operation);
+            return;
+        }
+        types.put(ctx, rType);
+    }
+
+    @Override
+    public void exitMINUS(LuluParser.MINUSContext ctx){
+        Token operation = ctx.MINUS().getSymbol();
+        // There is two kind of MINUS rules depending on expr count!
+        int expr_count = ctx.expr().size();
+        LuluType rType;
+        if (expr_count == 1){
+            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), operation.getType());
+        }else {
+            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)),
+                    operation.getType());
+        }
+        if(rType.getTypeCode()== LuluTypeSystem.UNDEFINED) {
+            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitBITWISE_AND(LuluParser.BITWISE_ANDContext ctx){
+        Token operation = ctx.BITWISE_AND().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitBITWISE_XOR(LuluParser.BITWISE_XORContext ctx){
+        Token operation = ctx.BITWISE_XOR().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitBITWISE_OR(LuluParser.BITWISE_ORContext ctx){
+        Token operation = ctx.BITWISE_OR().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitREL(LuluParser.RELContext ctx){
+        Token operation = ctx.REL().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitREL_EQ(LuluParser.REL_EQContext ctx){
+        Token operation = ctx.REL_EQ().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }       
+    
+    @Override
+    public void exitLOGICAL_AND(LuluParser.LOGICAL_ANDContext ctx){
+        Token operation = ctx.LOGICAL_AND().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitLOGICAL_OR(LuluParser.LOGICAL_ORContext ctx){
+        Token operation = ctx.LOGICAL_OR().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitALLOCATION(LuluParser.ALLOCATIONContext ctx){
+        types.put(ctx, types.get(ctx.handle_call()));
+    }
+    
+    @Override
+    public void exitFUNCTION(LuluParser.FUNCTIONContext ctx){
+        types.put(ctx, types.get(ctx.func_call()));
+    }
+    
+    @Override
+    public void exitVARC(LuluParser.VARCContext ctx){
+        types.put(ctx, types.get(ctx.var()));
+    }
+    
+    @Override
+    public void exitLISTC(LuluParser.LISTCContext ctx){
+        types.put(ctx, types.get(ctx.list()));
+    }
+    
+    @Override
+    public void exitNIL(LuluParser.NILContext ctx){
+        types.put(ctx, new LuluPrimitiveType(LuluTypeSystem.NIL));
+    }
+    
+    @Override
+    public void exitCONST(LuluParser.CONSTContext ctx){
+        types.put(ctx, types.get(ctx.const_val()));
+    }
+    
+    @Override 
+    public void exitINT(LuluParser.INTContext ctx){
+        types.put(ctx, new LuluPrimitiveType(LuluParser.INT_CONST));
+        String text = ctx.INT_CONST().getText();
+        Integer value;
+        if(text.length()>2&&text.substring(0, 2).toLowerCase().equals("0x"))
+            // It's hexadecimal!
+            value = Integer.parseInt(text.substring(2), 16);
+        else value = Integer.parseInt(text);
+        values.put(ctx, value);
+    }
+    
+    @Override
+    public void exitREAL(LuluParser.REALContext ctx){
+        types.put(ctx, new LuluPrimitiveType(LuluParser.REAL_CONST));
+        try{
+            values.put(ctx, Double.parseDouble(ctx.REAL_CONST().getText()));
+        }catch(NumberFormatException e){
+            values.put(ctx, ctx.REAL_CONST().getText());
+        }
+    }
+    
+    @Override
+    public void exitBOOL(LuluParser.BOOLContext ctx){
+        types.put(ctx, new LuluPrimitiveType(LuluParser.BOOL_CONST));  
+        values.put(ctx, ctx.BOOL_CONST().getText().equals("true"));
+        
+    }
+    
+    @Override
+    public void exitSTRING(LuluParser.STRINGContext ctx){
+        types.put(ctx, new LuluPrimitiveType(LuluParser.STRING_CONST));
+        values.put(ctx, ctx.STRING_CONST().getText());
+    }
+
     
     @Override
     public void exitPRIM(LuluParser.PRIMContext ctx){
@@ -636,22 +733,24 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             case "string":
                 type = LuluParser.STRING_CONST;
         }
-        types.put(ctx, type);
+        types.put(ctx, new LuluPrimitiveType(type));
     }
+    
     
     @Override
     public void exitID(LuluParser.IDContext ctx){
         Token t = ctx.ID().getSymbol();
-        LuluType tType = currentScope.resolve(t.getText());
-        if(tType == null){
+        LuluEntry entry = currentScope.resolve(t.getText());
+        if(entry == null){
             // Since we are sure this ID is not a PRIM keyword, null result of resolve means:
             error(String.format("Type %s not declared.", t.getText()), t);
             return;
-        }else if(!(tType instanceof LuluObjectType)){
+        }else if(!(entry.getType() instanceof LuluObjectType)){
             // This ID is taken!
             error(String.format("Type name %s is already taken by another field.", t.getText()), t);
             return;
         }
-        types.put(ctx, tType.getTypeCode());
+        types.put(ctx, entry.getType());
     }
+    
 }
