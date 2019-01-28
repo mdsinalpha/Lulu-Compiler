@@ -35,7 +35,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     public ArrayList<LuluError> errorList;
     
-    private LuluSymbolTable currentScope;
+    public static LuluSymbolTable currentScope;
     private LuluSymbolTable currentTypeScope;
      
     private final LuluLableGenerator lableGenerator;
@@ -88,7 +88,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         //codeMap.put(currentScope.getTag(), new ArrayList<>());
         
         // Maintain gui tree:
-        TreeItem currentTreeItem = new TreeItem(currentScope.getTag());
+        TreeItem currentTreeItem = new TreeItem(currentScope.toString());
         LuluRun.scopeDataMap.put(currentTreeItem, currentScope.getTable());
         LuluRun.rootItem.getChildren().add(currentTreeItem);
         LuluRun.rootItem = currentTreeItem;
@@ -109,6 +109,18 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public void enterProgram(LuluParser.ProgramContext ctx){
         // Program needs a root scope for globals:
         saveScope(new LuluSymbolTable(GLOBAL_TAG));
+        
+        /** TEST
+        saveScope(new LuluSymbolTable(MAIN_TAG, LuluSymbolTable.stType.loop));
+        currentScope.define("average", new LuluEntry("average", LuluEntry.aModifier.public_, true, 
+            new LuluArrayType(new LuluPrimitiveType(LuluParser.REAL_CONST), 5), 17.95, 40));
+        releaseScope();
+      
+        saveScope(new LuluSymbolTable("animal", LuluSymbolTable.stType.type));
+        saveScope(new LuluSymbolTable("getSound", LuluSymbolTable.stType.conditional));
+        releaseScope();
+        releaseScope();*/
+       
         // Type 'object' is reserved by Lulu compiler:)
         LuluEntry object = new LuluEntry(LuluTypeSystem.OBJECT_TAG, 
                 LuluEntry.aModifier.private_, true, new LuluPrimitiveType(LuluTypeSystem.OBJECT), new Object(), 4);
@@ -140,8 +152,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             argsTypes.put(arg, new ArrayList<>());
         });
         if(ctx.args_var() != null)
-           argsTypes.put(ctx.args_var(), new ArrayList<>());
-        
+           argsTypes.put(ctx.args_var(), new ArrayList<>());        
     }
 
     @Override

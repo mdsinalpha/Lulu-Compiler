@@ -3,6 +3,7 @@ package lulu.model;
 import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import lulu.LuluSemanticAnalyzer;
 import lulu.model.types.LuluFunctionType;
 import org.antlr.v4.runtime.misc.MultiMap;
 
@@ -23,11 +24,11 @@ public class LuluSymbolTable{
    private Integer scopeSizes;
    
    public LuluSymbolTable(String tag){
-       this(tag , stType.normal, null);
+       this(tag , stType.normal, LuluSemanticAnalyzer.currentScope);
    }
    
    public LuluSymbolTable(String tag, stType tableType){
-       this(tag, tableType, null);
+       this(tag, tableType, LuluSemanticAnalyzer.currentScope);
    }
    
    public LuluSymbolTable(String tag, stType tableType, LuluSymbolTable parent){
@@ -108,10 +109,13 @@ public class LuluSymbolTable{
                         (!type.getType().isDefined()))));
     }
     
-    public ObservableList<LuluEntry> getTable(){
-        ArrayList<LuluEntry> collector = new ArrayList<>();
-        table.values().stream().forEach(a -> {collector.addAll(a);});
-        return FXCollections.observableArrayList(collector);
+    public MultiMap<String, LuluEntry> getTable(){
+        return table;
+    }
+    
+    @Override
+    public String toString(){
+        return tag + " - " + tableType;
     }
    
 }

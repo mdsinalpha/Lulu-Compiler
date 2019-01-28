@@ -1,12 +1,13 @@
 package lulu.gui;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,6 +26,7 @@ import lulu.parser.LuluParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 /**
@@ -53,7 +55,7 @@ public class LuluRun extends Application {
     }
     
     public static TreeItem rootItem = new TreeItem("LULU");
-    public static Map<TreeItem, ObservableList<LuluEntry>> scopeDataMap = new HashMap<>();
+    public static Map<TreeItem, MultiMap<String, LuluEntry>> scopeDataMap = new HashMap<>();
     
     public void reveal(ActionEvent e){
         
@@ -73,7 +75,9 @@ public class LuluRun extends Application {
         // Setting tree's node select event:
         tree.getSelectionModel().selectedItemProperty().addListener((ObservableValue observable, Object oldValue, Object newValue) -> {
             TreeItem<String> selectedItem = (TreeItem<String>) newValue;
-            table.setItems(scopeDataMap.get(selectedItem));
+            ArrayList<LuluEntry> collector = new ArrayList<>();
+            scopeDataMap.get(selectedItem).values().stream().forEach(a -> {collector.addAll(a);});
+            table.setItems(FXCollections.observableArrayList(collector));
         });
         
         // Making table columns ready:
