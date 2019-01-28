@@ -2,6 +2,8 @@ package lulu;
 
 
 import java.util.*;
+import javafx.scene.control.TreeItem;
+import lulu.gui.LuluRun;
 import lulu.model.LuluEntry;
 
 import lulu.model.LuluSymbolTable;
@@ -33,7 +35,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     public ArrayList<LuluError> errorList;
     
-    private final ParseTreeProperty<LuluSymbolTable> scopes;
     private LuluSymbolTable currentScope;
     private LuluSymbolTable currentTypeScope;
      
@@ -61,8 +62,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         
         errorList = new ArrayList<>();
         
-        scopes = new ParseTreeProperty<>();
-        
         lableGenerator = new LuluLableGenerator("L");
         //variableGenerator = new LuluLableGenerator("T");    
         
@@ -82,11 +81,17 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         errorList.add(new LuluError(message, token.getLine(), token.getStartIndex(), token.getStopIndex()));
     }
     
-    private void saveScope(ParserRuleContext ctx, LuluSymbolTable scope){
+    private void saveScope(LuluSymbolTable scope){
         // Entering an scope.
         currentScope = scope;
-        scopes.put(ctx, currentScope);
+        
         //codeMap.put(currentScope.getTag(), new ArrayList<>());
+        
+        // Maintain gui tree:
+        TreeItem currentTreeItem = new TreeItem(currentScope.getTag());
+        LuluRun.scopeDataMap.put(currentTreeItem, currentScope.getTable());
+        LuluRun.rootItem.getChildren().add(currentTreeItem);
+        LuluRun.rootItem = currentTreeItem;
     }
     
     private void releaseScope(){
@@ -95,15 +100,18 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         if(parent != null)
             parent.increaseOffset(currentScope.getSize());
         currentScope = parent;
+        
+        // Maintain gui tree:
+        LuluRun.rootItem = LuluRun.rootItem.getParent();
     }
         
     @Override
     public void enterProgram(LuluParser.ProgramContext ctx){
         // Program needs a root scope for globals:
-        saveScope(ctx, new LuluSymbolTable(GLOBAL_TAG));
+        saveScope(new LuluSymbolTable(GLOBAL_TAG));
         // Type 'object' is reserved by Lulu compiler:)
-        LuluEntry object = new LuluEntry(LuluEntry.aModifier.private_, true, 
-            new LuluPrimitiveType(LuluTypeSystem.OBJECT), new Object(), 4);
+        LuluEntry object = new LuluEntry(LuluTypeSystem.OBJECT_TAG, 
+                LuluEntry.aModifier.private_, true, new LuluPrimitiveType(LuluTypeSystem.OBJECT), new Object(), 4);
         currentScope.define(LuluTypeSystem.OBJECT_TAG, object);
     }
     
@@ -154,7 +162,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             error(String.format("Function %s already declared.", t.getText()), t);
             return;
         }
-        entry = new LuluEntry(LuluEntry.aModifier.public_, false, fType);
+        entry = new LuluEntry(t.getText(), LuluEntry.aModifier.public_, false, fType);
         currentScope.define(t.getText(), entry);
     }
     

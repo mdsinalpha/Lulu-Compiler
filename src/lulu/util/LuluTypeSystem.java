@@ -184,8 +184,7 @@ public class LuluTypeSystem {
         return false;
     }
 
-    public static boolean convertable(LuluFunctionType source, LuluFunctionType destination) {
-
+    public static boolean convertable(LuluFunctionType source, LuluFunctionType destination){
         if (source.inputTypes.size() != destination.inputTypes.size()) {
             return false;
         }

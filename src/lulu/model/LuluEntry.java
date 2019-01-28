@@ -10,21 +10,23 @@ public class LuluEntry {
     
     public enum aModifier{public_, protected_, private_};
    
+    private final String ID;
     private final aModifier accessModifier;
-    private final boolean isConst;
+    private final Boolean isConst;
     private final LuluType type;
     
     private Object data;
     private Integer size;
     private Integer offset;
     
-    public LuluEntry(aModifier accessModifier, boolean isConst, LuluType type){
-        this(accessModifier, isConst, type, null, 0);
+    public LuluEntry(String ID, aModifier accessModifier, Boolean isConst, LuluType type){
+        this(ID, accessModifier, isConst, type, null, 0);
     }
    
     
-    public LuluEntry(aModifier accessModifier, boolean isConst, LuluType type,
+    public LuluEntry(String ID, aModifier accessModifier, Boolean isConst, LuluType type,
             Object data, Integer size){
+        this.ID = ID;
         this.accessModifier = accessModifier;
         this.isConst = isConst;
         this.type = type;
@@ -32,11 +34,15 @@ public class LuluEntry {
         this.size = size;
     }
     
+    public String getID(){
+        return ID;
+    }
+    
     public aModifier getAccessModifier(){
         return accessModifier;
     }
     
-    public boolean isConst(){
+    public Boolean getIsConst(){
         return isConst;
     }
     

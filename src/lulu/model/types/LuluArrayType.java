@@ -49,6 +49,11 @@ public class LuluArrayType implements LuluType{
         return false;
     }
     
+    @Override
+    public String toString(){
+        return String.format("ARRAY(%d, %s)", dimensions, elementType.toString());
+    }
+    
     /*
     private Integer index(Integer [] dimensions){
         Integer index = 0;

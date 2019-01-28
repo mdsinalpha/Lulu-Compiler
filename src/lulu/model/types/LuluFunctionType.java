@@ -49,4 +49,9 @@ public class LuluFunctionType implements LuluType {
         return false;
     }
     
+    @Override
+    public String toString(){
+        return inputTypes.toString() + " -> " + outputTypes.toString();
+    }
+    
 }

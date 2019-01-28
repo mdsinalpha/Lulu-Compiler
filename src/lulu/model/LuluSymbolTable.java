@@ -1,5 +1,8 @@
 package lulu.model;
 
+import java.util.ArrayList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import lulu.model.types.LuluFunctionType;
 import org.antlr.v4.runtime.misc.MultiMap;
 
@@ -62,10 +65,9 @@ public class LuluSymbolTable{
    
    public boolean hasf(String id, LuluFunctionType type){
        if(table.containsKey(id))
-           for(LuluEntry function:table.get(id))
-               if(function.getType() instanceof LuluFunctionType)
-                   if(function.getType().equals(type))
-                       return true;
+           if(table.get(id).stream().filter((function) -> (function.getType() instanceof LuluFunctionType)).anyMatch((function) -> (function.getType().equals(type)))) {
+                return true;
+       }
        return false;
    }
     
@@ -87,6 +89,10 @@ public class LuluSymbolTable{
    }
    
    public void increaseOffset(Integer size){
+       /* Nested inside scopes sizes are needed for:
+          1-Whole scope size 
+          2-Increasing offset
+       */
        offset += size;
        scopeSizes += size;
    }
@@ -100,6 +106,12 @@ public class LuluSymbolTable{
         return table.values().stream().anyMatch((typeList) -> 
                 (typeList.stream().anyMatch((type) ->
                         (!type.getType().isDefined()))));
+    }
+    
+    public ObservableList<LuluEntry> getTable(){
+        ArrayList<LuluEntry> collector = new ArrayList<>();
+        table.values().stream().forEach(a -> {collector.addAll(a);});
+        return FXCollections.observableArrayList(collector);
     }
    
 }
