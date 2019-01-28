@@ -1,8 +1,5 @@
 package lulu.model;
 
-import java.util.ArrayList;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import lulu.LuluSemanticAnalyzer;
 import lulu.model.types.LuluFunctionType;
 import org.antlr.v4.runtime.misc.MultiMap;

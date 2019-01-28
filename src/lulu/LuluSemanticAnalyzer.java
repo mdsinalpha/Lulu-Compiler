@@ -7,13 +7,11 @@ import lulu.gui.LuluRun;
 import lulu.model.LuluEntry;
 
 import lulu.model.LuluSymbolTable;
-import lulu.model.types.LuluArrayType;
 import lulu.model.types.LuluFunctionType;
 import lulu.model.types.LuluObjectType;
 import lulu.model.types.LuluPrimitiveType;
 import lulu.model.types.LuluType;
 import lulu.parser.LuluBaseListener;
-import lulu.parser.LuluLexer;
 import lulu.parser.LuluParser;
 import lulu.util.LuluError;
 import lulu.util.LuluLableGenerator;
@@ -28,8 +26,6 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  */
 public class LuluSemanticAnalyzer extends LuluBaseListener {
     
-    //public Map<String, ArrayList<String>> codeMap;
-    
     public Map<Integer, LuluPrimitiveType> primMap;
     public Map<Integer, LuluObjectType> typeMap;
     
@@ -39,20 +35,18 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     private LuluSymbolTable currentTypeScope;
      
     private final LuluLableGenerator lableGenerator;
-    //private LuluLableGenerator variableGenerator;
     
+    private final ParseTreeProperty<LuluSymbolTable> scopes;
     private final ParseTreeProperty<Object> values;
     private final ParseTreeProperty<LuluType> types;
     private final ParseTreeProperty<ArrayList<LuluType>> argsTypes;
-    //private ParseTreeProperty<String> variables;
+    
     
     public static final String GLOBAL_TAG = "global";
     public static final String MAIN_TAG = "start";
     
     
-    public LuluSemanticAnalyzer(){
-        //codeMap = new OrderedHashMap<>();
-            
+    public LuluSemanticAnalyzer(){            
         primMap = new HashMap<>();
         primMap.put(LuluParser.INT_CONST, new LuluPrimitiveType(LuluParser.INT_CONST));
         primMap.put(LuluParser.REAL_CONST, new LuluPrimitiveType(LuluParser.REAL_CONST));
@@ -63,29 +57,24 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         errorList = new ArrayList<>();
         
         lableGenerator = new LuluLableGenerator("L");
-        //variableGenerator = new LuluLableGenerator("T");    
         
+        scopes = new ParseTreeProperty<>();
         values = new ParseTreeProperty<>();
         types = new ParseTreeProperty<>();
         argsTypes = new ParseTreeProperty<>();
-        //variables = new ParseTreeProperty<>();
     }
      
-    /*
-    private void generateCode(String tCode){
-        codeMap.get(currentScope.getTag()).add(tCode);
-    }*/
+   
     
     private void error(String message, Token token){
         // Adding an error with it's occurence position inside list of compile errors:
         errorList.add(new LuluError(message, token.getLine(), token.getStartIndex(), token.getStopIndex()));
     }
     
-    private void saveScope(LuluSymbolTable scope){
+    private void saveScope(ParserRuleContext ctx, LuluSymbolTable scope){
         // Entering an scope.
         currentScope = scope;
-        
-        //codeMap.put(currentScope.getTag(), new ArrayList<>());
+        scopes.put(ctx, scope);
         
         // Maintain gui tree:
         TreeItem currentTreeItem = new TreeItem(currentScope.toString());
@@ -108,7 +97,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override
     public void enterProgram(LuluParser.ProgramContext ctx){
         // Program needs a root scope for globals:
-        saveScope(new LuluSymbolTable(GLOBAL_TAG));
+        saveScope(ctx, new LuluSymbolTable(GLOBAL_TAG));
         
         /** TEST
         saveScope(new LuluSymbolTable(MAIN_TAG, LuluSymbolTable.stType.loop));

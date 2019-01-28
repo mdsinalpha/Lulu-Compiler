@@ -1,6 +1,7 @@
 package lulu.gui;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import lulu.LuluMiniatureCodeGenerator;
 import lulu.LuluSemanticAnalyzer;
 import lulu.model.LuluEntry;
 import lulu.parser.LuluLexer;
@@ -119,19 +121,10 @@ public class LuluRun extends Application {
             LuluSemanticAnalyzer loader = new LuluSemanticAnalyzer();
             walker.walk(loader, programCtx);
             launch(args);
-            /*
-            loader.codeMap.keySet().stream().map((tag) -> {
-                System.out.printf("%s:\n", tag);
-                return tag;
-            }).forEachOrdered((tag) -> {
-                loader.codeMap.get(tag).forEach((code) -> {
-                    System.out.println(code);
-                 });
-            }); *//*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
+            /*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
             File output = new File(args[1]);
             FileWriter writer = new FileWriter(output);
-            while(generator.hasNextLine())
-            writer.write(generator.nextLine()+"\n");
+            writer.write(generator.getCode());
             writer.flush();
             writer.close();*/
         }catch(Exception e){
