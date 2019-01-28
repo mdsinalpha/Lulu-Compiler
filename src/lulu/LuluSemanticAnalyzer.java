@@ -542,14 +542,15 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
        values.put(ctx, entry);
     }
     
-    /*
+    @Override
+    public void enterIF(LuluParser.IFContext ctx){
+        saveScope(ctx, new LuluSymbolTable(tagGenerator.getNextLable(), 
+                LuluSymbolTable.stType.conditional));
+    }
+    
     @Override
     public void exitIF(LuluParser.IFContext ctx){
-        // DONE @hashmei expr type checking
-        if(!primMap.containsKey(types.get(ctx.expr()))){
-            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
-                    ctx.expr().getStart());
-        }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
+        if(!types.get(ctx.expr()).convertable(new LuluPrimitiveType(LuluParser.BOOL_CONST))){
             error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
         }    
@@ -557,70 +558,41 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitCASE(LuluParser.CASEContext ctx){
-        // DONE @hashemi var type checking
-        if(!primMap.containsKey(types.get(ctx.var()))){
-            error(String.format("Can not evaluate %s to boolean.",ctx.var().getText()),
-                    ctx.var().getStart());
-        }else if(!primMap.get(types.get(ctx.var())).convertable(LuluLexer.INT_CONST)){
-            error(String.format("Can not evaluate %s to boolean.",ctx.var().getText()),
+        if(!types.get(ctx.var()).convertable(new LuluPrimitiveType(LuluParser.INT_CONST))){
+            error(String.format("Can not evaluate %s to integer.",ctx.var().getText()),
                     ctx.var().getStart());
         }
     }
     
     @Override
     public void enterFOR(LuluParser.FORContext ctx){
-        saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
+        saveScope(ctx, new LuluSymbolTable(tagGenerator.getNextLable(), 
+                LuluSymbolTable.stType.loop));
     }
     
     @Override
     public void exitFOR(LuluParser.FORContext ctx){
-        if(!primMap.containsKey(types.get(ctx.expr()))){
-            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
-                    ctx.expr().getStart());
-        }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
+        if(!types.get(ctx.expr()).convertable(new LuluPrimitiveType(LuluParser.BOOL_CONST))){
             error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
         }
-        //TODO @hashemi type assign 
+        //TODO type assign 
     }
     
     @Override
     public void enterWHILE(LuluParser.WHILEContext ctx){
-        saveScope(ctx, new LuluSymbolTable(lableGenerator.getNextLable(), currentScope));
+        saveScope(ctx, new LuluSymbolTable(tagGenerator.getNextLable(), 
+                LuluSymbolTable.stType.loop));
     }
     
     @Override
     public void exitWHILE(LuluParser.WHILEContext ctx){
-        if(!primMap.containsKey(types.get(ctx.expr()))){
-            error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
-                    ctx.expr().getStart());
-        }else if(!primMap.get(types.get(ctx.expr())).convertable(LuluLexer.BOOL_CONST)){
+        if(!types.get(ctx.expr()).convertable(new LuluPrimitiveType(LuluParser.BOOL_CONST))){
             error(String.format("Can not evaluate %s to boolean.",ctx.expr().getText()),
                     ctx.expr().getStart());
         }
     }
     
-    @Override
-    public void enterHandle_call(LuluParser.Handle_callContext ctx){
-        argsTypes.put(ctx, new ArrayList<>());
-    }
-    
-    @Override
-    public void exitHandle_call(LuluParser.Handle_callContext ctx){
-        Collections.reverse(argsTypes.get(ctx));
-    }
-    
-    @Override
-    public void enterParams(LuluParser.ParamsContext ctx){
-        argsTypes.put(ctx, argsTypes.get(ctx.getParent()));
-    }
-    
-    @Override
-    public void exitParams(LuluParser.ParamsContext ctx){
-       // TODO
-       // argsTypes.get(ctx).add(e);
-    }
-*/
     @Override
     public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
         types.put(ctx, types.get(ctx.expr()));
