@@ -3,6 +3,8 @@ package lulu;
 import java.util.ArrayList;
 import java.util.Map;
 import lulu.model.LuluSymbolTable;
+import lulu.parser.LuluBaseListener;
+import lulu.parser.LuluParser;
 import lulu.util.LuluLableGenerator;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
@@ -11,7 +13,7 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  *
  * @author mdsinalpha
  */
-public class LuluMiniatureCodeGenerator {
+public class LuluMiniatureCodeGenerator extends LuluBaseListener {
     
     private final LuluSemanticAnalyzer analyzer;
     
@@ -39,6 +41,16 @@ public class LuluMiniatureCodeGenerator {
         currentScope = currentScope.getParent();
     }
     
+    @Override
+    public void enterProgram(LuluParser.ProgramContext ctx){
+        saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void exitProgram(LuluParser.ProgramContext ctx){
+        releaseScope();
+    }
+    
     
     public LuluMiniatureCodeGenerator(LuluSemanticAnalyzer analyzer){
         this.analyzer = analyzer;
@@ -62,4 +74,5 @@ public class LuluMiniatureCodeGenerator {
         });
         return builder.toString();
     }
+    
 }

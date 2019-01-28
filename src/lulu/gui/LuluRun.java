@@ -107,8 +107,9 @@ public class LuluRun extends Application {
     }
     
     public static void main(String[] args){
-         try{
-             File input = new File("program.lulu");
+        LuluSemanticAnalyzer analyzer = new LuluSemanticAnalyzer();
+        try{
+            File input = new File("program.lulu");
             //File input = new File(args[0]);
             StringBuilder program = new StringBuilder();
             Scanner scan = new Scanner(input);
@@ -118,8 +119,7 @@ public class LuluRun extends Application {
             LuluParser parser = new LuluParser(new CommonTokenStream(lexer));
             ParserRuleContext programCtx = parser.program();
             ParseTreeWalker walker = new ParseTreeWalker();
-            LuluSemanticAnalyzer loader = new LuluSemanticAnalyzer();
-            walker.walk(loader, programCtx);
+            walker.walk(analyzer, programCtx);
             launch(args);
             /*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
             File output = new File(args[1]);
@@ -131,6 +131,7 @@ public class LuluRun extends Application {
             //TODO Make log file
             e.printStackTrace();
         }
+        System.out.println(analyzer.errorList);
     }
     
 }

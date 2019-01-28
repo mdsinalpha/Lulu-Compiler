@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  */
 public class LuluSemanticAnalyzer extends LuluBaseListener {
     
+    
     public Map<Integer, LuluPrimitiveType> primMap;
     public Map<Integer, LuluObjectType> typeMap;
     
@@ -93,6 +94,10 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         // Maintain gui tree:
         LuluRun.rootItem = LuluRun.rootItem.getParent();
     }
+    
+    public LuluSymbolTable getScope(ParserRuleContext ctx){
+        return scopes.get(ctx);
+    }
         
     @Override
     public void enterProgram(LuluParser.ProgramContext ctx){
@@ -134,6 +139,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         releaseScope();
     }
     
+    /*
     @Override
     public void enterFunc_dcl(LuluParser.Func_dclContext ctx){
         // Each function has input/output LuluType lists, making the lists ready for args/args_var:
@@ -166,7 +172,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         currentScope.define(t.getText(), entry);
     }
     
-    /*
+    
     @Override
     public void enterArgs(LuluParser.ArgsContext ctx){
         // Moving parent's LuluType list to child's context, so when args exits we can add a LuluType inside it!
@@ -352,199 +358,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         releaseScope();
     }
 
-        
-    @Override
-    public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
-        types.put(ctx, types.get(ctx.expr()));
-    }
-    
-    @Override
-    public void exitUNARY_OP(LuluParser.UNARY_OPContext ctx){
-        Token operation = ctx.UNARY_OP().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr()), operation.getType());
-        if(rType== LuluTypeSystem.UNDEFINED) {
-            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
-            return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitBITWISE_NOT(LuluParser.BITWISE_NOTContext ctx){
-        Token operation = ctx.BITWISE_NOT().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr()), operation.getType());
-        if(rType== LuluTypeSystem.UNDEFINED) {
-            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
-            return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override 
-    public void exitARIT_P1(LuluParser.ARIT_P1Context ctx){
-        Token operation = ctx.ARIT_P1().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-
-    @Override
-    public void exitARIT_P2(LuluParser.ARIT_P2Context ctx){
-        Token operation = ctx.ARIT_P2().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-            error(String.format("Incompatible types on operation %s.",
-                    operation.getText()), operation);
-            return;
-        }
-        types.put(ctx, rType);
-    }
-
-    @Override
-    public void exitMINUS(LuluParser.MINUSContext ctx){
-        Token operation = ctx.MINUS().getSymbol();
-        int expr_count = ctx.expr().size();
-        Integer rType;
-        if (expr_count == 1){
-            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), operation.getType());
-        }else {
-            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)),
-                    operation.getType());
-        }
-        if(rType== LuluTypeSystem.UNDEFINED) {
-            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
-            return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitBITWISE_AND(LuluParser.BITWISE_ANDContext ctx){
-        Token operation = ctx.BITWISE_AND().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitBITWISE_XOR(LuluParser.BITWISE_XORContext ctx){
-        Token operation = ctx.BITWISE_XOR().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitBITWISE_OR(LuluParser.BITWISE_ORContext ctx){
-        Token operation = ctx.BITWISE_OR().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitREL(LuluParser.RELContext ctx){
-        Token operation = ctx.REL().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitREL_EQ(LuluParser.REL_EQContext ctx){
-        Token operation = ctx.REL_EQ().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }       
-    
-    @Override
-    public void exitLOGICAL_AND(LuluParser.LOGICAL_ANDContext ctx){
-        Token operation = ctx.LOGICAL_AND().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitLOGICAL_OR(LuluParser.LOGICAL_ORContext ctx){
-        Token operation = ctx.LOGICAL_OR().getSymbol();
-        Integer rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
-                types.get(ctx.expr(1)), operation.getType());
-        if(rType==LuluTypeSystem.UNDEFINED){
-                error(String.format("Incompatible types on operation %s.",
-                        operation.getText()), operation);
-                return;
-        }
-        types.put(ctx, rType);
-    }
-    
-    @Override
-    public void exitALLOCATION(LuluParser.ALLOCATIONContext ctx){
-        types.put(ctx, types.get(ctx.handle_call()));
-    }
-    
-    @Override
-    public void exitFUNCTION(LuluParser.FUNCTIONContext ctx){
-        types.put(ctx, types.get(ctx.func_call()));
-    }
-    
-    @Override
-    public void exitVARC(LuluParser.VARCContext ctx){
-        types.put(ctx, types.get(ctx.var()));
-    }
-    
-    @Override
-    public void exitLISTC(LuluParser.LISTCContext ctx){
-        types.put(ctx, types.get(ctx.list()));
-    }
-    
-    @Override
-    public void exitNIL(LuluParser.NILContext ctx){
-        types.put(ctx, LuluTypeSystem.NIL);
-    }
-    
-    @Override
-    public void exitCONST(LuluParser.CONSTContext ctx){
-        types.put(ctx, types.get(ctx.const_val()));
-    }
-    
     @Override
     public void exitRef(LuluParser.RefContext ctx){
         // Checking array indexing validation:
@@ -674,35 +487,235 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
        // TODO
        // argsTypes.get(ctx).add(e);
     }
+*/
+    @Override
+    public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
+        types.put(ctx, types.get(ctx.expr()));
+    }
+    
+    @Override
+    public void exitUNARY_OP(LuluParser.UNARY_OPContext ctx){
+        Token operation = ctx.UNARY_OP().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr()), operation.getType());
+        if(rType.getTypeCode()== LuluTypeSystem.UNDEFINED) {
+            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitBITWISE_NOT(LuluParser.BITWISE_NOTContext ctx){
+        Token operation = ctx.BITWISE_NOT().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr()), operation.getType());
+        if(rType.getTypeCode()== LuluTypeSystem.UNDEFINED) {
+            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override 
+    public void exitARIT_P1(LuluParser.ARIT_P1Context ctx){
+        Token operation = ctx.ARIT_P1().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+
+    @Override
+    public void exitARIT_P2(LuluParser.ARIT_P2Context ctx){
+        Token operation = ctx.ARIT_P2().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+            error(String.format("Incompatible types on operation %s.",
+                    operation.getText()), operation);
+            return;
+        }
+        types.put(ctx, rType);
+    }
+
+    @Override
+    public void exitMINUS(LuluParser.MINUSContext ctx){
+        Token operation = ctx.MINUS().getSymbol();
+        // There is two kind of MINUS rules depending on expr count!
+        int expr_count = ctx.expr().size();
+        LuluType rType;
+        if (expr_count == 1){
+            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), operation.getType());
+        }else {
+            rType = LuluTypeSystem.type(types.get(ctx.expr(0)), types.get(ctx.expr(1)),
+                    operation.getType());
+        }
+        if(rType.getTypeCode()== LuluTypeSystem.UNDEFINED) {
+            error(String.format("Incompatible types on operation %s.", operation.getText()), operation);
+            return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitBITWISE_AND(LuluParser.BITWISE_ANDContext ctx){
+        Token operation = ctx.BITWISE_AND().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitBITWISE_XOR(LuluParser.BITWISE_XORContext ctx){
+        Token operation = ctx.BITWISE_XOR().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitBITWISE_OR(LuluParser.BITWISE_ORContext ctx){
+        Token operation = ctx.BITWISE_OR().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitREL(LuluParser.RELContext ctx){
+        Token operation = ctx.REL().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitREL_EQ(LuluParser.REL_EQContext ctx){
+        Token operation = ctx.REL_EQ().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }       
+    
+    @Override
+    public void exitLOGICAL_AND(LuluParser.LOGICAL_ANDContext ctx){
+        Token operation = ctx.LOGICAL_AND().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitLOGICAL_OR(LuluParser.LOGICAL_ORContext ctx){
+        Token operation = ctx.LOGICAL_OR().getSymbol();
+        LuluType rType = LuluTypeSystem.type(types.get(ctx.expr(0)), 
+                types.get(ctx.expr(1)), operation.getType());
+        if(rType.getTypeCode()==LuluTypeSystem.UNDEFINED){
+                error(String.format("Incompatible types on operation %s.",
+                        operation.getText()), operation);
+                return;
+        }
+        types.put(ctx, rType);
+    }
+    
+    @Override
+    public void exitALLOCATION(LuluParser.ALLOCATIONContext ctx){
+        types.put(ctx, types.get(ctx.handle_call()));
+    }
+    
+    @Override
+    public void exitFUNCTION(LuluParser.FUNCTIONContext ctx){
+        types.put(ctx, types.get(ctx.func_call()));
+    }
+    
+    @Override
+    public void exitVARC(LuluParser.VARCContext ctx){
+        types.put(ctx, types.get(ctx.var()));
+    }
+    
+    @Override
+    public void exitLISTC(LuluParser.LISTCContext ctx){
+        types.put(ctx, types.get(ctx.list()));
+    }
+    
+    @Override
+    public void exitNIL(LuluParser.NILContext ctx){
+        types.put(ctx, new LuluPrimitiveType(LuluTypeSystem.NIL));
+    }
+    
+    @Override
+    public void exitCONST(LuluParser.CONSTContext ctx){
+        types.put(ctx, types.get(ctx.const_val()));
+    }
     
     @Override 
     public void exitINT(LuluParser.INTContext ctx){
+        types.put(ctx, new LuluPrimitiveType(LuluParser.INT_CONST));
         String text = ctx.INT_CONST().getText();
         Integer value;
         if(text.length()>2&&text.substring(0, 2).toLowerCase().equals("0x"))
+            // It's hexadecimal!
             value = Integer.parseInt(text.substring(2), 16);
         else value = Integer.parseInt(text);
         values.put(ctx, value);
-        types.put(ctx, LuluLexer.INT_CONST);
     }
     
     @Override
     public void exitREAL(LuluParser.REALContext ctx){
-        values.put(ctx, Double.parseDouble(ctx.REAL_CONST().getText()));
-        types.put(ctx, LuluLexer.REAL_CONST);
+        types.put(ctx, new LuluPrimitiveType(LuluParser.REAL_CONST));
+        try{
+            values.put(ctx, Double.parseDouble(ctx.REAL_CONST().getText()));
+        }catch(NumberFormatException e){
+            values.put(ctx, ctx.REAL_CONST().getText());
+        }
     }
     
     @Override
     public void exitBOOL(LuluParser.BOOLContext ctx){
+        types.put(ctx, new LuluPrimitiveType(LuluParser.BOOL_CONST));  
         values.put(ctx, ctx.BOOL_CONST().getText().equals("true"));
-        types.put(ctx, LuluParser.BOOL_CONST);  
+        
     }
     
     @Override
     public void exitSTRING(LuluParser.STRINGContext ctx){
+        types.put(ctx, new LuluPrimitiveType(LuluParser.STRING_CONST));
         values.put(ctx, ctx.STRING_CONST().getText());
-        types.put(ctx, LuluParser.STRING_CONST);
     }
+
     
     @Override
     public void exitPRIM(LuluParser.PRIMContext ctx){
@@ -720,23 +733,24 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             case "string":
                 type = LuluParser.STRING_CONST;
         }
-        types.put(ctx, type);
+        types.put(ctx, new LuluPrimitiveType(type));
     }
+    
     
     @Override
     public void exitID(LuluParser.IDContext ctx){
         Token t = ctx.ID().getSymbol();
-        LuluType tType = currentScope.resolve(t.getText());
-        if(tType == null){
+        LuluEntry entry = currentScope.resolve(t.getText());
+        if(entry == null){
             // Since we are sure this ID is not a PRIM keyword, null result of resolve means:
             error(String.format("Type %s not declared.", t.getText()), t);
             return;
-        }else if(!(tType instanceof LuluObjectType)){
+        }else if(!(entry.getType() instanceof LuluObjectType)){
             // This ID is taken!
             error(String.format("Type name %s is already taken by another field.", t.getText()), t);
             return;
         }
-        types.put(ctx, tType.getTypeCode());
+        types.put(ctx, entry.getType());
     }
-    */
+    
 }
