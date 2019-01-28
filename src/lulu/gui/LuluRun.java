@@ -75,10 +75,11 @@ public class LuluRun extends Application {
         
         tree.setRoot(rootItem);
         // Setting tree's node select event:
-        tree.getSelectionModel().selectedItemProperty().addListener((ObservableValue observable, Object oldValue, Object newValue) -> {
+        tree.getSelectionModel().selectedItemProperty().addListener(
+                (ObservableValue observable, Object oldValue, Object newValue) -> {
             TreeItem<String> selectedItem = (TreeItem<String>) newValue;
             ArrayList<LuluEntry> collector = new ArrayList<>();
-            scopeDataMap.get(selectedItem).values().stream().forEach(a -> {collector.addAll(a);});
+            scopeDataMap.get(selectedItem).values().stream().forEach(a -> collector.addAll(a));
             table.setItems(FXCollections.observableArrayList(collector));
         });
         
@@ -120,7 +121,6 @@ public class LuluRun extends Application {
             ParserRuleContext programCtx = parser.program();
             ParseTreeWalker walker = new ParseTreeWalker();
             walker.walk(analyzer, programCtx);
-            launch(args);
             /*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
             File output = new File(args[1]);
             FileWriter writer = new FileWriter(output);
@@ -132,6 +132,7 @@ public class LuluRun extends Application {
             e.printStackTrace();
         }
         System.out.println(analyzer.errorList);
+        launch(args);
     }
     
 }

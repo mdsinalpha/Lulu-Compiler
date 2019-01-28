@@ -1,0 +1,39 @@
+declare{
+	animal;
+	cat;
+	dog;
+}
+type sound{
+	protected string voiceStr;
+	public function sound(string voiceStr){
+		this.voiceStr=voiceStr;	
+	}
+}
+type animal{
+	private sound voice;
+	public function animal(string s){
+		this.voice = allocate sound();
+	}
+	public (sound s) function getSound () {
+		s = this.voice;
+		
+	}
+}
+type cat:animal{
+	public function cat(){
+		this.voice = allocate sound("mioo");
+	}
+	
+}
+type dog:animal{
+	public function cat(){
+		this.voice = allocate sound("hup");
+	}
+}
+
+(int res)function start(){
+	animal  a = allocate cat();
+	string voice = a.voice.voiceStr;
+	res = 1;
+	return;
+}

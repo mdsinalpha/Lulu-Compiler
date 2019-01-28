@@ -1,0 +1,15 @@
+%% A sample program
+declare{
+    f1();
+    f2(int);
+    f3(int, float);
+    f4(int[][], string);
+   (bool) = native f5(string i, float[][][][] f);
+   (int, string) = f6();
+   (int, string, float, int[], string[][], float[][][]) = f7(string[] a);
+}
+
+function start() {
+ 
+}
+

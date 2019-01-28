@@ -13,6 +13,10 @@ public class LuluObjectType implements LuluType {
     
     private LuluType superType;
     private boolean defined;
+    
+    public LuluObjectType(String tag){
+        this(tag, new LuluPrimitiveType(LuluTypeSystem.OBJECT));
+    }
    
     public LuluObjectType(String tag, LuluType superType){
         typeCode = LuluTypeSystem.getNextObjectTypeCode();

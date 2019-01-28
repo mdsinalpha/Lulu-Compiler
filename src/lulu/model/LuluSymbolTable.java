@@ -50,7 +50,7 @@ public class LuluSymbolTable{
    }
   
    public boolean has(String id){
-        return table.containsKey(id);
+        return table.containsKey(id) && !(table.get(id) instanceof LuluFunctionType);
    }
    
    public LuluEntry resolve(String id){
@@ -63,7 +63,9 @@ public class LuluSymbolTable{
    
    public boolean hasf(String id, LuluFunctionType type){
        if(table.containsKey(id))
-           if(table.get(id).stream().filter((function) -> (function.getType() instanceof LuluFunctionType)).anyMatch((function) -> (function.getType().equals(type)))) {
+           if(table.get(id).stream().filter((function) -> 
+                   (function.getType() instanceof LuluFunctionType)).anyMatch((function) -> 
+                           (function.getType().equals(type)))) {
                 return true;
        }
        return false;
@@ -91,8 +93,9 @@ public class LuluSymbolTable{
           1-Whole scope size 
           2-Increasing offset
        */
+       /* TODO
        offset += size;
-       scopeSizes += size;
+       scopeSizes += size;*/
    }
       
    public Integer getSize(){
