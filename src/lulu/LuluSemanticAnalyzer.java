@@ -109,7 +109,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
        
         // Type 'object' is reserved by Lulu compiler:)
         LuluEntry object = new LuluEntry(LuluTypeSystem.OBJECT_TAG, 
-                LuluEntry.aModifier.private_, true, new LuluPrimitiveType(LuluTypeSystem.OBJECT), new Object(), 4);
+                LuluEntry.aModifier.private_, true, new LuluPrimitiveType(LuluTypeSystem.OBJECT), null);
         currentScope.define(LuluTypeSystem.OBJECT_TAG, object);
     }
     
@@ -231,7 +231,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         }
         argsIDs.get(ctx).add(ctx.ID().getText());
         
-        // TODO Comment
+        // Function definition args_var properties:
         if(ctx.getParent() instanceof LuluParser.Func_defContext){
             for(int i=0;i<argsTypes.get(ctx).size();i++){
                 if(!currentScope.has(argsIDs.get(ctx).get(i))){
@@ -312,7 +312,6 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             currentScope.define(tID.getText(), 
                     new LuluEntry(tID.getText(), tAM, tConst, tType));
             // TODO Put const data inside 
-            // TODO Move size to LuluType
             // TODO Make a new type class
             // TODO Allocation is not allowed inside declare
         }
@@ -477,6 +476,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     
     @Override
     public void exitAssign(LuluParser.AssignContext ctx){
+        // TODO
         if(ctx.var().size()==1){
             if(!types.get(ctx.expr()).convertable(ctx.var(0))){
                 error(String.format("Cannot assign %s to %s.", ctx.expr().getText(),
@@ -485,7 +485,50 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             }
         }
     }
-      
+    
+    @Override
+    public void exitRETURN(LuluParser.RETURNContext ctx){
+        LuluSymbolTable temp = currentScope;
+        boolean error = true;
+        while(temp != null){
+            if(temp.getTableType().equals(LuluSymbolTable.stType.function)){
+                error = false;
+                break;
+            }
+            temp = temp.getParent();
+        }
+        if(error) error("No function block found for statement 'return'.", ctx.getStart());
+        // TODO check output assignment 
+    }
+    
+    @Override
+    public void exitBREAK(LuluParser.BREAKContext ctx){
+        LuluSymbolTable temp = currentScope;
+        boolean error = true;
+        while(temp != null){
+            if(temp.getTableType().equals(LuluSymbolTable.stType.loop)){
+                error = false;
+                break;
+            }
+            temp = temp.getParent();
+        }
+        if(error) error("No loop block found for statement 'break'.", ctx.getStart());
+    }
+    
+    @Override
+    public void exitCONTINUE(LuluParser.CONTINUEContext ctx){
+        LuluSymbolTable temp = currentScope;
+        boolean error = true;
+        while(temp != null){
+            if(temp.getTableType().equals(LuluSymbolTable.stType.loop)){
+                error = false;
+                break;
+            }
+            temp = temp.getParent();
+        }
+        if(error) error("No loop block found for statement 'continue'.", ctx.getStart());
+    }
+    
     @Override
     public void exitVar(LuluParser.VarContext ctx){
        LuluSymbolTable varScope = currentScope;

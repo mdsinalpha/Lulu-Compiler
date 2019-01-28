@@ -6,8 +6,9 @@ package lulu.model.types;
  */
 public interface LuluType {
     
-    public abstract Integer getTypeCode();
-    public abstract boolean isDefined();
-    public abstract boolean convertable(Object o);
+    public Integer getTypeCode();
+    public Integer getSize();
+    public boolean isDefined();
+    public boolean convertable(Object o);
     
 }

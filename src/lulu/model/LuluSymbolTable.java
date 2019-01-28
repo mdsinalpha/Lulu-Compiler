@@ -1,6 +1,5 @@
 package lulu.model;
 
-import java.util.Collections;
 import lulu.LuluSemanticAnalyzer;
 import lulu.model.types.LuluFunctionType;
 import org.antlr.v4.runtime.misc.MultiMap;
@@ -110,9 +109,11 @@ public class LuluSymbolTable{
                         (!type.getType().isDefined()))));
     }
     
-    // TODO
     public MultiMap<String, LuluEntry> getTable(){
-        return table;
+        MultiMap<String, LuluEntry> tTable = new MultiMap<>();
+        tTable.putAll(table);
+        if(parent!=null) tTable.putAll(parent.getTable());
+        return tTable;
     }
     
     @Override

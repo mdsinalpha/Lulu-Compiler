@@ -21,6 +21,11 @@ public class LuluArrayType implements LuluType{
         return LuluTypeSystem.ARRAY;
     }
     
+    @Override
+    public Integer getSize(){
+        return 4;
+    }
+    
     public LuluType getElementType(){
         return elementType;
     }

@@ -27,7 +27,12 @@ public class LuluFunctionType implements LuluType {
     @Override
     public Integer getTypeCode() {
         return LuluTypeSystem.FUNCTION;
-    } 
+    }
+    
+    @Override
+    public Integer getSize(){
+        return 4;
+    }
         
     public boolean isNative(){
         return isNative;

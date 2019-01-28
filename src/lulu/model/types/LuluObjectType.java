@@ -26,15 +26,19 @@ public class LuluObjectType implements LuluType {
     }
     
     @Override
-    public Integer getTypeCode() {
+    public Integer getTypeCode(){
         return typeCode;
+    }
+    
+    @Override
+    public Integer getSize(){
+        return 4;
     }
    
     public String getTag(){
         return tag;
     }
     
-    // TODO
     public void setSuperType(LuluType superType){
         this.superType = superType;
     }

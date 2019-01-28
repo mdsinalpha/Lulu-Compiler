@@ -16,22 +16,20 @@ public class LuluEntry {
     private final LuluType type;
     
     private Object data;
-    private Integer size;
     private Integer offset;
     
     public LuluEntry(String ID, aModifier accessModifier, Boolean isConst, LuluType type){
-        this(ID, accessModifier, isConst, type, null, 0);
+        this(ID, accessModifier, isConst, type, null);
     }
    
     
     public LuluEntry(String ID, aModifier accessModifier, Boolean isConst, LuluType type,
-            Object data, Integer size){
+            Object data){
         this.ID = ID;
         this.accessModifier = accessModifier;
         this.isConst = isConst;
         this.type = type;
         this.data = data;
-        this.size = size;
     }
     
     public String getID(){
@@ -57,13 +55,9 @@ public class LuluEntry {
     public Object getData(){
         return data;
     }
-    
-    public void setSize(Integer size){
-        this.size = size;
-    }
-    
+      
     public Integer getSize(){
-        return size;
+        return type.getSize();
     }
     
     public void setOffset(Integer offset){

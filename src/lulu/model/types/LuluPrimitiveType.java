@@ -16,8 +16,23 @@ public class LuluPrimitiveType implements LuluType {
     }
 
     @Override
-    public Integer getTypeCode() {
+    public Integer getTypeCode(){
         return typeCode;
+    }
+    
+    @Override
+    public Integer getSize(){
+        switch(typeCode){
+            case LuluParser.BOOL_CONST:
+                return 1;
+            case LuluParser.INT_CONST:
+                return 4;
+            case LuluParser.STRING_CONST:
+                return 4;
+            case LuluParser.REAL_CONST:
+                return 8;
+        }
+        return 0;
     }
         
     @Override
