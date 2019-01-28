@@ -80,6 +80,9 @@ public class LuluTypeSystem {
                 Integer t5 = type4(operand1, operand2);
                 Integer t6 = type3(operand1, operand2);
                 return t5 == UNDEFINED ? (t6 == UNDEFINED ? type5(operand1, operand2) : t6) : t5;
+            case LuluLexer.MINUS:
+                Integer t7 = type1(operand1, operand2);
+                return t7 == UNDEFINED ? type2(operand1, operand2) : t7;
 
         }
         return UNDEFINED;
@@ -143,7 +146,7 @@ public class LuluTypeSystem {
     public static boolean convertable(Integer source, Integer destination) {
         switch (destination) {
             case LuluLexer.REAL_CONST:
-                if (source == LuluLexer.REAL_CONST || source == LuluLexer.INT_CONST) {
+                if (source == LuluLexer.REAL_CONST || source == LuluLexer.INT_CONST || source == LuluLexer.BOOL_CONST) {
                     return true;
                 }
                 break;
@@ -158,7 +161,7 @@ public class LuluTypeSystem {
                 }
                 break;
             case LuluLexer.STRING_CONST:
-                if (source == LuluLexer.STRING_CONST || source == LuluLexer.BOOL_CONST) {
+                if (source == LuluLexer.STRING_CONST || source == LuluLexer.BOOL_CONST || source == LuluLexer.INT_CONST) {
                     return true;
                 }
                 break;
