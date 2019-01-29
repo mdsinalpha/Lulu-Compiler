@@ -20,14 +20,16 @@ public class LuluMiniatureCodeGenerator extends LuluBaseListener {
     public Map<String, ArrayList<String>> codeMap;
     
     public static LuluSymbolTable currentScope;
+    private LuluSymbolTable globalScope;
     
+    private final LuluLableGenerator lableGenerator;
     private final LuluLableGenerator variableGenerator;
     
     private final ParseTreeProperty<String> variables;
     
      
-    private void generateCode(String tCode){
-        codeMap.get(currentScope.getTag()).add(tCode);
+    private void generateCode(String fCode, Object ... args){
+        codeMap.get(currentScope.getTag()).add(String.format(fCode, args));
     }
     
     private void saveScope(LuluSymbolTable scope){
@@ -41,22 +43,13 @@ public class LuluMiniatureCodeGenerator extends LuluBaseListener {
         currentScope = currentScope.getParent();
     }
     
-    @Override
-    public void enterProgram(LuluParser.ProgramContext ctx){
-        saveScope(analyzer.getScope(ctx));
-    }
-    
-    @Override
-    public void exitProgram(LuluParser.ProgramContext ctx){
-        releaseScope();
-    }
-    
     
     public LuluMiniatureCodeGenerator(LuluSemanticAnalyzer analyzer){
         this.analyzer = analyzer;
         
         codeMap = new OrderedHashMap<>();
         
+        lableGenerator = new LuluLableGenerator("L");
         variableGenerator = new LuluLableGenerator("T");
         
         variables = new ParseTreeProperty<>();
@@ -65,7 +58,7 @@ public class LuluMiniatureCodeGenerator extends LuluBaseListener {
     public String getCode(){
         StringBuilder builder = new StringBuilder();
         codeMap.entrySet().stream().map((block) -> {
-            builder.append(block.getKey()).append(" ");
+            builder.append(block.getKey()).append(": ");
             return block;
         }).forEachOrdered((block) -> {
             block.getValue().forEach((line) -> {
@@ -73,6 +66,173 @@ public class LuluMiniatureCodeGenerator extends LuluBaseListener {
             });
         });
         return builder.toString();
+    }
+    
+      
+    @Override
+    public void enterProgram(LuluParser.ProgramContext ctx){
+        globalScope = analyzer.getScope(ctx);
+        saveScope(globalScope);
+    }
+    
+    @Override
+    public void exitProgram(LuluParser.ProgramContext ctx){
+        releaseScope();
+    }
+    
+    @Override
+    public void enterBlock(LuluParser.BlockContext ctx){
+        if(!(ctx.getParent() instanceof LuluParser.WHILEContext) &&
+           !(ctx.getParent() instanceof LuluParser.FORContext) &&
+           !(ctx.getParent() instanceof LuluParser.IFContext && ctx.getParent().getChild(0).equals(ctx)) &&
+           !(ctx.getParent() instanceof LuluParser.Func_defContext))
+            saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void exitBlock(LuluParser.BlockContext ctx){
+        releaseScope();
+    }
+    
+    @Override
+    public void enterIF(LuluParser.IFContext ctx){
+        saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void enterFOR(LuluParser.FORContext ctx){
+        saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void enterWHILE(LuluParser.WHILEContext ctx){
+        saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void enterType_def(LuluParser.Type_defContext ctx){
+        saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void exitType_def(LuluParser.Type_defContext ctx){
+        currentScope = globalScope;
+    }
+    
+    @Override
+    public void enterFunc_def(LuluParser.Func_defContext ctx){
+        saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
+        variables.put(ctx, variables.get(ctx.expr()));
+    }
+    
+    @Override
+    public void exitUNARY_OP(LuluParser.UNARY_OPContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var); 
+        generateCode("%s = %s %s", var, ctx.UNARY_OP().getText(), variables.get(ctx.expr()));
+    }
+    
+    @Override
+    public void exitBITWISE_NOT(LuluParser.BITWISE_NOTContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var); 
+        generateCode("%s = %s %s", var, ctx.BITWISE_NOT().getText(), variables.get(ctx.expr()));
+    }
+    
+    @Override
+    public void exitMINUS(LuluParser.MINUSContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        int expr_count = ctx.expr().size();
+        if(expr_count == 2)
+            generateCode("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.MINUS().getText(), variables.get(ctx.expr(1)));
+        else generateCode("%s = %s %s", var, ctx.MINUS().getText(), variables.get(ctx.expr(0)));
+    }
+    
+    
+    @Override
+    public void exitARIT_P1(LuluParser.ARIT_P1Context ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        generateCode("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.ARIT_P1().getText(), variables.get(ctx.expr(1)));
+    }
+    
+    @Override
+    public void exitARIT_P2(LuluParser.ARIT_P2Context ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        generateCode("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.ARIT_P2().getText(), variables.get(ctx.expr(1)));
+    }
+    
+    @Override
+    public void exitBITWISE_AND(LuluParser.BITWISE_ANDContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        generateCode("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.BITWISE_AND().getText(), variables.get(ctx.expr(1)));
+    }
+    
+    @Override
+    public void exitBITWISE_XOR(LuluParser.BITWISE_XORContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        generateCode("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.BITWISE_XOR().getText(), variables.get(ctx.expr(1)));
+    }
+    
+    @Override
+    public void exitBITWISE_OR(LuluParser.BITWISE_ORContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        generateCode("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.BITWISE_OR().getText(), variables.get(ctx.expr(1)));
+    }
+    
+    @Override
+    public void exitREL(LuluParser.RELContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        generateCode("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.REL().getText(), variables.get(ctx.expr(1)));
+    }
+    
+    @Override
+    public void exitREL_EQ(LuluParser.REL_EQContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        generateCode("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.REL_EQ().getText(), variables.get(ctx.expr(1)));
+        
+    }
+    
+    @Override
+    public void exitLOGICAL_AND(LuluParser.LOGICAL_ANDContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        generateCode("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.LOGICAL_AND().getText(), variables.get(ctx.expr(1)));
+    }
+    
+    @Override
+    public void exitLOGICAL_OR(LuluParser.LOGICAL_ORContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        generateCode("%s = %s %s %s", var, variables.get(ctx.expr(0)),
+                ctx.LOGICAL_OR().getText(), variables.get(ctx.expr(1)));
+    }
+    
+    @Override
+    public void exitCONST(LuluParser.CONSTContext ctx){
+        String var = variableGenerator.getNextLable();
+        variables.put(ctx, var);
+        generateCode("%s = %s", var, analyzer.getValue(ctx.const_val()));
     }
     
 }

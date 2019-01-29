@@ -93,7 +93,11 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public LuluSymbolTable getScope(ParserRuleContext ctx){
         return scopes.get(ctx);
     }
-        
+    
+    public Object getValue(ParserRuleContext ctx){
+        return values.get(ctx);
+    }
+     
     @Override
     public void enterProgram(LuluParser.ProgramContext ctx){
         // Program needs a root scope for globals:
