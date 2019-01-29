@@ -6,7 +6,7 @@ declare{
 }
 type sound{
 	public string voiceStr;
-	public function sound(string voiceStr){
+	public function soundd(string voiceStr){
 		this.voiceStr=voiceStr;	
 	}
 }
@@ -15,24 +15,24 @@ type animal{
 	public function animal(string s){
 		this.voice = allocate sound(s);
 	}
-	public (sound s) function getSound () {
+	public (sound s) = function getSound () {
 		s = this.voice;
 		return;
 	}
 }
 type cat:animal{
 	public function cat(){
-		this.voice = allocate sound("mioo");
+		this.voice = allocate sound('mioo');
 	}
 	
 }
 type dog:animal{
 	public function cat(){
-		this.voice = allocate sound("hup");
+		this.voice = allocate sound('hup');
 	}
 }
 
-(int res)function start(){
+(int res) = function start(){
 	animal  a = allocate cat();
 	string voice = a.voice.voiceStr;
 	res = 0;

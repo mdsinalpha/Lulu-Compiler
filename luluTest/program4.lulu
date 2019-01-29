@@ -1,0 +1,16 @@
+%% A sample program
+declare{
+    animal;
+    f1();
+    (int) = f2(int);
+    (string) = f3(int, float);
+    f4(int[][], string);
+   (bool) = native f5(string i, float[][][][] f);
+   (int, string) = f6(animal);
+   (int, string, float, int[], string[][], float[][][]) = f7(string[] a);
+}
+
+function start() {
+ 
+}
+

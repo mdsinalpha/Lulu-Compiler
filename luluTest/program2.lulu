@@ -17,7 +17,7 @@ type student{
 	(a) = foo(s);
 	return;
 }
-(int a) function foo(student s){
+(int a) = function foo(student s){
 	int c ; float d;
 	(d,c) = s.average();
 	write(d);
