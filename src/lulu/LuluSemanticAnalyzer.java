@@ -32,6 +32,8 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public static LuluSymbolTable currentScope;
     private LuluSymbolTable currentTypeScope;
     private LuluSymbolTable lastReleasedScope;
+    private LuluSymbolTable globalScope;
+    private Map<String, LuluSymbolTable> typeTagToSTMap;
     
     private final ParseTreeProperty<LuluSymbolTable> scopes;
     private final ParseTreeProperty<Object> values;
@@ -45,7 +47,8 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public static final String MAIN_TAG = "start";
     
     
-    public LuluSemanticAnalyzer(){                    
+    public LuluSemanticAnalyzer(){
+        typeTagToSTMap = new HashMap<>();
         errorList = new ArrayList<>();
                
         scopes = new ParseTreeProperty<>();
@@ -94,7 +97,8 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     @Override
     public void enterProgram(LuluParser.ProgramContext ctx){
         // Program needs a root scope for globals:
-        saveScope(ctx, new LuluSymbolTable(GLOBAL_TAG));
+        globalScope = new LuluSymbolTable(GLOBAL_TAG);
+        saveScope(ctx, globalScope);
         
         /**TEST
         saveScope(ctx, new LuluSymbolTable(MAIN_TAG, LuluSymbolTable.stType.loop));
@@ -275,7 +279,12 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             error("Access modifiers are only allowed inside a type block.", ctx.ACCSSMOD().getSymbol());
             return;
         }
-        LuluEntry.aModifier tAM = LuluEntry.aModifier.public_;
+        LuluEntry.aModifier tAM;
+        if(ctx.getParent() instanceof LuluParser.Type_defContext){
+            tAM = LuluEntry.aModifier.private_;
+        }else{
+            tAM = LuluEntry.aModifier.public_;
+        }
         if(ctx.ACCSSMOD() != null)
             switch(ctx.ACCSSMOD().getText()){
                 case "private":
@@ -316,7 +325,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             // TODO Allocation is not allowed inside declare
         }
     }
-    
+   
     @Override
     public void exitRef(LuluParser.RefContext ctx){
         // Checking array indexing validation:
@@ -349,10 +358,16 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         if(ctx.ID(1)==null){
             // There is no super class definition for this definition:)
             LuluSymbolTable tData = new LuluSymbolTable(t.getText(), LuluSymbolTable.stType.type);
+            typeTagToSTMap.put(t.getText(), tData);
             entry.setData(tData);
             ((LuluObjectType)entry.getType()).define();
             currentScope.define(t.getText(), entry);
             currentTypeScope = tData;
+            LuluEntry defaultConstructor = new LuluEntry(t.getText(),
+                    LuluEntry.aModifier.public_, true,
+                    new LuluFunctionType(false,
+                new ArrayList<>(), new ArrayList<>()));
+            currentTypeScope.define(t.getText(), defaultConstructor);
             saveScope(ctx, tData);
             return;
         }
@@ -378,10 +393,16 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         LuluSymbolTable tData = new LuluSymbolTable(t.getText(), LuluSymbolTable.stType.type,
                 (LuluSymbolTable)superEntry.getData());
         entry.setData(tData);
+        typeTagToSTMap.put(t.getText(), tData);
         ((LuluObjectType)entry.getType()).setSuperType(superEntry.getType());
         ((LuluObjectType)entry.getType()).define();
         currentScope.define(t.getText(), entry);
         currentTypeScope = tData;
+        LuluEntry defaultConstructor = new LuluEntry(t.getText(),
+                    LuluEntry.aModifier.public_, true,
+                    new LuluFunctionType(false,
+                    new ArrayList<>(), new ArrayList<>()));
+        currentTypeScope.define(t.getText(), defaultConstructor);
         saveScope(ctx, tData);
     }
     
@@ -389,6 +410,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
     public void exitType_def(LuluParser.Type_defContext ctx){
         releaseScope();
         currentTypeScope = null;
+        currentScope = globalScope;
     }
     
     @Override
@@ -474,14 +496,50 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
         releaseScope();
     }
     
+    public void assignToVar(LuluParser.AssignContext ctx, int ind){
+        if(!types.get(ctx.expr()).convertable(types.get(ctx.var(ind)))){
+            error(String.format("Cannot assign %s to %s.", ctx.expr().getText(),
+                        ctx.var(ind).getText()), ctx.getToken(6, 0).getSymbol());
+            return;
+        }
+        LuluEntry entry = (LuluEntry) values.get(ctx.var(ind));
+        if(entry.getIsConst()){
+            error(String.format("Cannot assign to a const variable %s.",
+                    ctx.var(ind).getText()), ctx.getToken(6, 0).getSymbol());
+            return;
+        }
+        if(entry.getAccessModifier() == LuluEntry.aModifier.private_ &&
+                entry.getScope() != currentTypeScope){
+            //System.out.println(entry.getScope().getTag() + '\t' + currentTypeScope.getTag());
+            error(String.format("Assigning value to a private variable %s"
+                    + " outside of Type Scope", ctx.var(ind).getText()),
+                    ctx.getToken(6, 0).getSymbol());
+        }else if(entry.getAccessModifier() == LuluEntry.aModifier.protected_){
+            LuluSymbolTable sc = currentScope;
+            while(sc != null && sc != entry.getScope()){
+                sc = sc.getParent();
+            }
+            if(sc == null){
+                error(String.format("Assigning value to a protocted variable %s"
+                    + " outside of Inhreited Type Scopes", ctx.var(ind).getText()),
+                    ctx.getToken(6, 0).getSymbol());
+            }
+        }
+    }
+    
     @Override
     public void exitAssign(LuluParser.AssignContext ctx){
-        // TODO
         if(ctx.var().size()==1){
-            if(!types.get(ctx.expr()).convertable(ctx.var(0))){
-                error(String.format("Cannot assign %s to %s.", ctx.expr().getText(),
-                            ctx.var(0).getText()), ctx.getToken(6, 0).getSymbol());
-                return;
+            assignToVar(ctx, 0);
+        }else{
+            if(!(types.get(ctx.expr()) instanceof LuluFunctionType)){
+                error("multiple assignment only allowed on function calls",
+                        ctx.getToken(6, 0).getSymbol());
+            }else{
+                LuluFunctionType expr_t = (LuluFunctionType) types.get(ctx.expr());
+                for(int i=0; i<ctx.var().size(); i++){
+                    assignToVar(ctx, i);
+                }
             }
         }
     }
@@ -576,7 +634,8 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
                entry_t = entry.getType();
            }
            if(entry_t instanceof LuluObjectType){
-               varScope = (LuluSymbolTable) entry.getData();
+               String type_tag = ((LuluObjectType) entry_t).getTag();
+               varScope = typeTagToSTMap.get(type_tag);
            }else{
                varScope = null;
            }
@@ -635,6 +694,7 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
                     ctx.expr().getStart());
         }
     }
+        
     
     @Override
     public void exitPARENTHESES(LuluParser.PARENTHESESContext ctx){
@@ -899,6 +959,62 @@ public class LuluSemanticAnalyzer extends LuluBaseListener {
             return;
         }
         types.put(ctx, entry.getType());
+    }
+    
+    @Override
+    public void enterParams(LuluParser.ParamsContext ctx){
+        if(argsTypes.get(ctx.parent) != null){
+            argsTypes.put(ctx, argsTypes.get(ctx.parent));
+        }else{
+            argsTypes.put(ctx, new ArrayList<>());
+        }
+    }
+    
+    @Override
+    public void exitParams(LuluParser.ParamsContext ctx){
+        ArrayList<LuluType> params = argsTypes.get(ctx);
+        params.add(types.get(ctx.expr()));
+    }
+    
+    @Override
+    public void exitHandle_call(LuluParser.Handle_callContext ctx){
+        ArrayList<LuluType> paramsTypes;
+        if(ctx.params() != null){
+            paramsTypes = argsTypes.get(ctx.params());
+        }else{
+            paramsTypes = new ArrayList<>();
+        }
+        values.put(ctx, paramsTypes);
+    }
+    
+    @Override
+    public void exitHANDLE(LuluParser.HANDLEContext ctx){
+        if (ctx.var() != null){
+            if(!(types.get(ctx.var()) instanceof LuluObjectType)){
+                error(String.format("%s type can not be dereferenced", ctx), ctx.getStart());
+            }else{
+                LuluObjectType varType = (LuluObjectType) types.get(ctx.var());
+                LuluSymbolTable varTypeST = typeTagToSTMap.get(varType.getTag());
+                LuluEntry func_entry = varTypeST.resolvef(ctx.handle_call().ID().getText(),
+                        new LuluFunctionType(false,
+                        (ArrayList<LuluType>) values.get(ctx.handle_call()),
+                        new ArrayList<>()));
+                types.put(ctx,(LuluFunctionType) func_entry.getType());
+            }
+        }else{
+            Collections.reverse((ArrayList<LuluType>) values.get(ctx.handle_call()));
+            LuluEntry func_entry = currentScope.resolvef(ctx.handle_call().ID().getText(),
+                        new LuluFunctionType(false,
+                        (ArrayList<LuluType>) values.get(ctx.handle_call()),
+                        new ArrayList<>()));
+            if (func_entry == null){
+                error(String.format("cannot resolve function %s", ctx.handle_call().getText()),
+                        ctx.getStart());
+                types.put(ctx, new LuluPrimitiveType(LuluTypeSystem.UNDEFINED));
+            }else{
+                types.put(ctx,(LuluFunctionType) func_entry.getType());
+            }
+        }
     }
     
 }

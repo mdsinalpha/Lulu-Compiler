@@ -170,12 +170,18 @@ public class LuluTypeSystem {
     }
 
     public static boolean convertable(LuluObjectType source, LuluObjectType destination) {
+
         LuluObjectType temp = source;
-        while (!temp.getTypeCode().equals(OBJECT)) {
-            if (temp.getTypeCode().equals(destination.getTypeCode())) {
+        System.out.println("1 [log TypeSystem.converatble(T, T)] temp=" + temp.getTag());
+        while (!temp.getTag().equals(OBJECT_TAG)) {
+            if (temp.getTag().equals(destination.getTag())) {
+                System.out.println("[log TypeSystem.converatble(T, T)] matched "
+                        + "source: " + temp.getTag() + " dest: " + destination.getTag());
                 return true;
             }
+            System.out.println("2 [log TypeSystem.converatble(T, T)] temp=" +temp.getTag());
             temp = (LuluObjectType) temp.getSuperType();
+            System.out.println("3 [log TypeSystem.converatble(T, T)] temp=" +temp.getTag());
         }
         return false;
     }
@@ -188,19 +194,14 @@ public class LuluTypeSystem {
     }
 
     public static boolean convertable(LuluFunctionType source, LuluFunctionType destination){
-        if (source.inputTypes.size() != destination.inputTypes.size()) {
-            return false;
-        }
-        if (source.outputTypes.size() != destination.outputTypes.size()) {
+        
+        if (source.inputTypes.size() != destination.inputTypes.size()){
             return false;
         }
         for (int i = 0; i < source.inputTypes.size(); i++) {
-                if(!source.inputTypes.get(i).convertable(destination.inputTypes.get(i)))
+                if(!source.inputTypes.get(i).convertable(destination.inputTypes.get(i))){
                     return false;
-        }
-        for (int i = 0; i < source.outputTypes.size(); i++) {
-                if(!source.outputTypes.get(i).convertable(destination.outputTypes.get(i)))
-                    return false;
+                }
         }
         return true;
     }
