@@ -110,7 +110,7 @@ public class LuluRun extends Application {
     public static void main(String[] args){
         LuluSemanticAnalyzer analyzer = new LuluSemanticAnalyzer();
         try{
-            File input = new File("program.lulu");
+            File input = new File("luluTest/program1.lulu");
             //File input = new File(args[0]);
             StringBuilder program = new StringBuilder();
             Scanner scan = new Scanner(input);
@@ -121,18 +121,32 @@ public class LuluRun extends Application {
             ParserRuleContext programCtx = parser.program();
             ParseTreeWalker walker = new ParseTreeWalker();
             walker.walk(analyzer, programCtx);
-            /*LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(loader);
-            File output = new File(args[1]);
-            FileWriter writer = new FileWriter(output);
-            writer.write(generator.getCode());
-            writer.flush();
-            writer.close();*/
-        }catch(Exception e){
-            //TODO Make log file
-            e.printStackTrace();
+        }catch(Exception e){}
+        
+        boolean successful = analyzer.errorList.isEmpty();
+        if(successful){
+            System.out.println("Compiled Successfully!");
+            try{
+                LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(analyzer);
+                File output = new File(args[1]);
+                FileWriter writer = new FileWriter(output);
+                writer.write(generator.getCode());
+                writer.flush();
+                writer.close();
+            }catch(Exception e){}
+            ArrayList<String> flags = new ArrayList<>();
+            for(String s:args)
+                if(s.charAt(0)=='-') flags.add(s);
+            if(flags.contains("-reveal")) launch(args);
+            /*
+            if(flags.contains("-simulate")) try{
+                Runtime.getRuntime().exec("python3 assembler/assemble.py "+args[1]+" __mc.mc");
+                Runtime.getRuntime().exec("python3 simulator/simulate.py __mc.mc");
+            }catch(Exception e){}*/
         }
-        System.out.println(analyzer.errorList);
-        launch(args);
+        else
+            analyzer.errorList.stream().forEach(error -> 
+                System.err.println(error+" {"+error.getStart()+"|"+error.getEnd()+"}"));
     }
     
 }
