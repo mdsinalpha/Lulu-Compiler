@@ -20,6 +20,7 @@ public class LuluMiniatureCodeGenerator extends LuluBaseListener {
     public Map<String, ArrayList<String>> codeMap;
     
     public static LuluSymbolTable currentScope;
+    private LuluSymbolTable globalScope;
     
     private final LuluLableGenerator lableGenerator;
     private final LuluLableGenerator variableGenerator;
@@ -42,16 +43,6 @@ public class LuluMiniatureCodeGenerator extends LuluBaseListener {
         currentScope = currentScope.getParent();
     }
     
-    @Override
-    public void enterProgram(LuluParser.ProgramContext ctx){
-        saveScope(analyzer.getScope(ctx));
-    }
-    
-    @Override
-    public void exitProgram(LuluParser.ProgramContext ctx){
-        releaseScope();
-    }
-    
     
     public LuluMiniatureCodeGenerator(LuluSemanticAnalyzer analyzer){
         this.analyzer = analyzer;
@@ -67,7 +58,7 @@ public class LuluMiniatureCodeGenerator extends LuluBaseListener {
     public String getCode(){
         StringBuilder builder = new StringBuilder();
         codeMap.entrySet().stream().map((block) -> {
-            builder.append(block.getKey()).append(" ");
+            builder.append(block.getKey()).append(": ");
             return block;
         }).forEachOrdered((block) -> {
             block.getValue().forEach((line) -> {
@@ -75,6 +66,62 @@ public class LuluMiniatureCodeGenerator extends LuluBaseListener {
             });
         });
         return builder.toString();
+    }
+    
+      
+    @Override
+    public void enterProgram(LuluParser.ProgramContext ctx){
+        globalScope = analyzer.getScope(ctx);
+        saveScope(globalScope);
+    }
+    
+    @Override
+    public void exitProgram(LuluParser.ProgramContext ctx){
+        releaseScope();
+    }
+    
+    @Override
+    public void enterBlock(LuluParser.BlockContext ctx){
+        if(!(ctx.getParent() instanceof LuluParser.WHILEContext) &&
+           !(ctx.getParent() instanceof LuluParser.FORContext) &&
+           !(ctx.getParent() instanceof LuluParser.IFContext && ctx.getParent().getChild(0).equals(ctx)) &&
+           !(ctx.getParent() instanceof LuluParser.Func_defContext))
+            saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void exitBlock(LuluParser.BlockContext ctx){
+        releaseScope();
+    }
+    
+    @Override
+    public void enterIF(LuluParser.IFContext ctx){
+        saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void enterFOR(LuluParser.FORContext ctx){
+        saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void enterWHILE(LuluParser.WHILEContext ctx){
+        saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void enterType_def(LuluParser.Type_defContext ctx){
+        saveScope(analyzer.getScope(ctx));
+    }
+    
+    @Override
+    public void exitType_def(LuluParser.Type_defContext ctx){
+        currentScope = globalScope;
+    }
+    
+    @Override
+    public void enterFunc_def(LuluParser.Func_defContext ctx){
+        saveScope(analyzer.getScope(ctx));
     }
     
     @Override

@@ -79,7 +79,8 @@ public class LuluRun extends Application {
                 (ObservableValue observable, Object oldValue, Object newValue) -> {
             TreeItem<String> selectedItem = (TreeItem<String>) newValue;
             ArrayList<LuluEntry> collector = new ArrayList<>();
-            scopeDataMap.get(selectedItem).values().stream().forEach(a -> collector.addAll(a));
+            if(scopeDataMap.containsKey(selectedItem))
+                scopeDataMap.get(selectedItem).values().stream().forEach(a -> collector.addAll(a));
             table.setItems(FXCollections.observableArrayList(collector));
         });
         
@@ -108,18 +109,19 @@ public class LuluRun extends Application {
     }
     
     public static void main(String[] args){
+        ParserRuleContext programCtx = null;
         LuluSemanticAnalyzer analyzer = new LuluSemanticAnalyzer();
+        ParseTreeWalker walker = new ParseTreeWalker();
         try{
-            File input = new File("luluTest/program1.lulu");
-            //File input = new File(args[0]);
+            //File input = new File("program.lulu");
+            File input = new File(args[0]);
             StringBuilder program = new StringBuilder();
             Scanner scan = new Scanner(input);
             while(scan.hasNextLine())
                 program.append(scan.nextLine()).append("\n");
             LuluLexer lexer = new LuluLexer(new ANTLRInputStream(program.toString()));
             LuluParser parser = new LuluParser(new CommonTokenStream(lexer));
-            ParserRuleContext programCtx = parser.program();
-            ParseTreeWalker walker = new ParseTreeWalker();
+            programCtx = parser.program();
             walker.walk(analyzer, programCtx);
         }catch(Exception e){}
         
@@ -128,6 +130,8 @@ public class LuluRun extends Application {
             System.out.println("Compiled Successfully!");
             try{
                 LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(analyzer);
+                walker.walk(generator, programCtx);
+                //File output = new File("ic.asm");
                 File output = new File(args[1]);
                 FileWriter writer = new FileWriter(output);
                 writer.write(generator.getCode());
@@ -137,7 +141,8 @@ public class LuluRun extends Application {
             ArrayList<String> flags = new ArrayList<>();
             for(String s:args)
                 if(s.charAt(0)=='-') flags.add(s);
-            if(flags.contains("-reveal")) launch(args);
+            if(flags.contains("-reveal")) 
+                launch(args);
             /*
             if(flags.contains("-simulate")) try{
                 Runtime.getRuntime().exec("python3 assembler/assemble.py "+args[1]+" __mc.mc");
