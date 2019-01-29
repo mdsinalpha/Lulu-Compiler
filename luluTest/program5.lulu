@@ -5,16 +5,16 @@ declare{
     string mamad = 'aleki';
     float t = 5.5;
     string str = 2 + true;
-    int adamvar = 2 * 3 / 4 - 9 + 14 % 20 & 7;
+    int adamvar = 2 * 3 / 4 - 9 + 14 || 20 & 7;
 }
 
 (int a, float b) = function foo (int c, float d) {
-	int c = 5;
-	%%a = c+e;
-	%%b = d + 5.5;
+	int z = 5;
+	a = c+a;
+	b = d + 5.5;
 }
 
-function start() {
-	 
+(int res) = function start(){
+
 }
 

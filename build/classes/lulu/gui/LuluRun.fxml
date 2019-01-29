@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="AnchorPane" prefHeight="900.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lulu.gui.LuluSymbolTableTreeRevealer">
+<AnchorPane id="AnchorPane" prefHeight="900.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lulu.gui.LuluRun">
    <children>
       <Text layoutX="891.0" layoutY="867.0" strokeType="OUTSIDE" strokeWidth="0.0" text="LULU 2" wrappingWidth="131.7294921875">
          <effect>
@@ -43,6 +43,11 @@
       <Label layoutX="884.0" layoutY="22.0" text="Symbol Table">
          <font>
             <Font name="DejaVu Sans Mono Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="size" layoutX="465.0" layoutY="847.0" prefHeight="16.0" prefWidth="157.0" text="Size:">
+         <font>
+            <Font size="18.0" />
          </font>
       </Label>
    </children>

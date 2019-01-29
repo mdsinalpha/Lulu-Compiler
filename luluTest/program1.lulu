@@ -12,7 +12,7 @@ type sound{
 }
 type animal{
 	protected sound voice;
-	public function animal(string s){
+	public function animall(string s){
 		this.voice = allocate sound(s);
 	}
 	public (sound s) = function getSound () {
@@ -21,13 +21,13 @@ type animal{
 	}
 }
 type cat:animal{
-	public function cat(){
+	public function catt(){
 		this.voice = allocate sound('mioo');
 	}
 	
 }
 type dog:animal{
-	public function cat(){
+	public function dogg(){
 		this.voice = allocate sound('hup');
 	}
 }

@@ -5,7 +5,7 @@ float average = 0;
 }
 type student{
 	public int sum = 100, count=5;
-	public (float, int) = function average(){
+	public (float x, int y) = function average(){
 		(a, b) = sum/count;
 		return;
 	}
