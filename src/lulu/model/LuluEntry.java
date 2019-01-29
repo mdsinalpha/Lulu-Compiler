@@ -1,5 +1,6 @@
 package lulu.model;
 
+import lulu.LuluSemanticAnalyzer;
 import lulu.model.types.LuluType;
 
 /**
@@ -14,6 +15,7 @@ public class LuluEntry {
     private final aModifier accessModifier;
     private final Boolean isConst;
     private final LuluType type;
+    private final LuluSymbolTable scope;
     
     private Object data;
     private Integer offset;
@@ -30,6 +32,7 @@ public class LuluEntry {
         this.isConst = isConst;
         this.type = type;
         this.data = data;
+        scope = LuluSemanticAnalyzer.currentScope;
     }
     
     public String getID(){
@@ -46,6 +49,10 @@ public class LuluEntry {
     
     public LuluType getType(){
         return type;
+    }
+    
+    public LuluSymbolTable getScope(){
+        return scope;
     }
     
     public void setData(Object data){

@@ -15,7 +15,7 @@ public class LuluObjectType implements LuluType {
     private boolean defined;
     
     public LuluObjectType(String tag){
-        this(tag, new LuluPrimitiveType(LuluTypeSystem.OBJECT));
+        this(tag, new LuluObjectType(LuluTypeSystem.OBJECT_TAG, null));
     }
    
     public LuluObjectType(String tag, LuluType superType){
@@ -72,7 +72,7 @@ public class LuluObjectType implements LuluType {
     
     @Override
     public String toString(){
-        return "LuluType";
+        return "LuluObjectType <"+this.tag+">";
     }
     
 }

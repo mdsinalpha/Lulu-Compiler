@@ -72,11 +72,13 @@ public class LuluSymbolTable{
    }
     
    public LuluEntry resolvef(String id, LuluFunctionType type){
-       if(table.containsKey(id))
+       if(table.containsKey(id)){
            for(LuluEntry function:table.get(id))
-               if(function.getType() instanceof LuluFunctionType)
-                   if(function.getType().convertable(type))
-                       return function;
+                if(function.getType() instanceof LuluFunctionType){
+                    if(type.convertable(function.getType()))
+                        return function;
+                }
+       }
        if(parent!=null)
            return parent.resolvef(id, type);
        return null;
@@ -110,15 +112,13 @@ public class LuluSymbolTable{
     }
     
     public MultiMap<String, LuluEntry> getTable(){
-        MultiMap<String, LuluEntry> tTable = new MultiMap<>();
-        tTable.putAll(table);
-        if(parent!=null) tTable.putAll(parent.getTable());
-        return tTable;
+        return table;
     }
     
     @Override
     public String toString(){
-        return tag + " - " + tableType;
+        return tag + " - " + tableType +(tableType.equals(stType.type)&&parent!=null&&
+                parent.getTableType().equals(stType.type)?" : "+parent.getTag():"");
     }
    
 }
