@@ -170,18 +170,12 @@ public class LuluTypeSystem {
     }
 
     public static boolean convertable(LuluObjectType source, LuluObjectType destination) {
-
         LuluObjectType temp = source;
-        System.out.println("1 [log TypeSystem.converatble(T, T)] temp=" + temp.getTag());
         while (!temp.getTag().equals(OBJECT_TAG)) {
             if (temp.getTag().equals(destination.getTag())) {
-                System.out.println("[log TypeSystem.converatble(T, T)] matched "
-                        + "source: " + temp.getTag() + " dest: " + destination.getTag());
                 return true;
             }
-            System.out.println("2 [log TypeSystem.converatble(T, T)] temp=" +temp.getTag());
             temp = (LuluObjectType) temp.getSuperType();
-            System.out.println("3 [log TypeSystem.converatble(T, T)] temp=" +temp.getTag());
         }
         return false;
     }

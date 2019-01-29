@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
@@ -23,6 +24,7 @@ import javafx.stage.Stage;
 import lulu.LuluMiniatureCodeGenerator;
 import lulu.LuluSemanticAnalyzer;
 import lulu.model.LuluEntry;
+import lulu.model.LuluSymbolTable;
 import lulu.parser.LuluLexer;
 import lulu.parser.LuluParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -46,6 +48,9 @@ public class LuluRun extends Application {
     @FXML
     private TableView table;
     
+    @FXML
+    private Label size;
+    
     @Override
     public void start(Stage stage) throws Exception{ 
         Parent root = FXMLLoader.load(getClass().getResource(FXML_PATH)); 
@@ -57,7 +62,7 @@ public class LuluRun extends Application {
     }
     
     public static TreeItem rootItem = new TreeItem("LULU");
-    public static Map<TreeItem, MultiMap<String, LuluEntry>> scopeDataMap = new HashMap<>();
+    public static Map<TreeItem, LuluSymbolTable> scopeDataMap = new HashMap<>();
     
     public void reveal(ActionEvent e){
         
@@ -79,8 +84,10 @@ public class LuluRun extends Application {
                 (ObservableValue observable, Object oldValue, Object newValue) -> {
             TreeItem<String> selectedItem = (TreeItem<String>) newValue;
             ArrayList<LuluEntry> collector = new ArrayList<>();
-            if(scopeDataMap.containsKey(selectedItem))
-                scopeDataMap.get(selectedItem).values().stream().forEach(a -> collector.addAll(a));
+            if(scopeDataMap.containsKey(selectedItem)){
+                scopeDataMap.get(selectedItem).getTable().values().stream().forEach(a -> collector.addAll(a));
+                size.setText("Size:"+scopeDataMap.get(selectedItem).getSize());
+            }
             table.setItems(FXCollections.observableArrayList(collector));
         });
         
@@ -113,7 +120,7 @@ public class LuluRun extends Application {
         LuluSemanticAnalyzer analyzer = new LuluSemanticAnalyzer();
         ParseTreeWalker walker = new ParseTreeWalker();
         try{
-            //File input = new File("program.lulu");
+            //File input = new File("luluTest/program1.lulu");
             File input = new File(args[0]);
             StringBuilder program = new StringBuilder();
             Scanner scan = new Scanner(input);
@@ -131,8 +138,8 @@ public class LuluRun extends Application {
             try{
                 LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(analyzer);
                 walker.walk(generator, programCtx);
-                //File output = new File("ic.asm");
-                File output = new File(args[1]);
+                File output = new File("ic.lulu");
+                //File output = new File(args[1]);
                 FileWriter writer = new FileWriter(output);
                 writer.write(generator.getCode());
                 writer.flush();
