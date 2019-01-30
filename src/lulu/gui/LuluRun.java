@@ -138,8 +138,8 @@ public class LuluRun extends Application {
             try{
                 LuluMiniatureCodeGenerator generator = new LuluMiniatureCodeGenerator(analyzer);
                 walker.walk(generator, programCtx);
-                File output = new File("ic.lulu");
-                //File output = new File(args[1]);
+                //File output = new File("ic.lulu");
+                File output = new File(args[1]);
                 FileWriter writer = new FileWriter(output);
                 writer.write(generator.getCode());
                 writer.flush();

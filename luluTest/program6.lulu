@@ -4,7 +4,7 @@ declare{
 	instructor;
 }
 type human{
-	int humanPrivate;
+	public int humanPrivate;
 	protected string name;
 	(int humanity)= function get_humanity(){
 		humanPrivate = 10;
@@ -16,7 +16,7 @@ type student:human{
 	const int kk = 10000000;
 	(string cc) = function get_parent_name(){
 		humanPrivate = 789;
-		kk = 10;
+		%%kk = 10;
 		name = 'sample';
 		return;
 	}
@@ -34,10 +34,11 @@ type instructor:human{
 (int res)= function start(){
 	student h;
 	human x;
-	h.name = 'wtx';
-	int a, b = foo(10, h, 9);
+	%%h.name = 'wtx';
+	int a, b;
+	%%(a, b) = foo(10, h);
 	%%human h = allocate student();
-	int name = h.get_parent_name();
+	%%string name = h.get_parent_name();
 	%%write(name);
 	res = 0;
 	return;

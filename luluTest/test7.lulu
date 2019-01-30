@@ -1,0 +1,16 @@
+function alex(){
+    switch super.alex{
+        case 1:{
+            destruct [][] alex;
+        }
+        case 2:{
+            destruct [][][] karshenas;
+        }
+        case 3:{
+            const bool var = a *!b[d[3]+~W]-c/2|c(v(5,6))^3==3%a&3&&2||sds!=q>t>=y; 
+        }
+        default:{
+            book memo[n][m] = allocate book(); 
+        }
+    }
+}

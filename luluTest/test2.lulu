@@ -1,0 +1,9 @@
+(int n) = function fib(int n_){
+    if n_ <= 2 {
+        (n) = 1;
+    }
+    else {
+        (n) = fib(n_-1) + fib(n_-2);
+    }
+    return;
+}

@@ -1,0 +1,16 @@
+(int n) = function fib(int n_){
+    %~ ads akfnsdfkald aflsfjg ;lad
+
+     dfjwrigj adsd;adsl lk nafa\  \t ajfk  \n akfs \ r ~%
+    if n_ <= 2 && n_ >= 3{
+        if m == n-3*-a {
+            (n) = 1;
+        }
+    }
+    else {
+        if b > 2 || !true {%~ leylaho laho leylaho adovare gonemani haza leylado ~%
+            (n) = fib(n_-1) + fib(n_-2);
+        }
+    }
+    return;
+}

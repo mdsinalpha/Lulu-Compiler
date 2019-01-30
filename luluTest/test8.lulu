@@ -1,0 +1,5 @@
+%% test 8
+type db:bd{
+    private const string a[allocate b()], p[[[this.a.a.a], [((write(t)))]]][nil];
+    protected int a[b[c[d]]];
+}

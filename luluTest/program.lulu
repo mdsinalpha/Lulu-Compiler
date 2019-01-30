@@ -1,0 +1,35 @@
+%% A sample program
+declare{
+    int a;
+    mytype;
+    (int, float) = f1(float b);
+}
+
+type mytype {
+    protected int x;
+    public (float y) = function myfun(int z){
+        if (z > this.x){
+            y = 23.5;
+        }
+        else{
+            y = 15.2;
+        }
+        return;
+    }
+}
+
+(int r) = function start() {
+    const float c = 0.23;
+    int s;
+    read(s);
+    float w;
+    (r, w) = f1(s);
+    return;
+}
+
+(int x, float y) = function f1(int b){
+    mytype a = allocate mytype();
+    (y) = a.myfun(b);
+    x = 0;
+    return;
+}

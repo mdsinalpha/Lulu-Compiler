@@ -8,6 +8,7 @@ type sound{
 	public string voiceStr;
 	public function soundd(string voiceStr){
 		this.voiceStr=voiceStr;	
+ 		int a = 2 * 7 + 7 || 6 ^ 2 - 2;
 	}
 }
 type animal{
@@ -33,6 +34,7 @@ type dog:animal{
 }
 
 (int res) = function start(){
+	float n = (2.5 + true) / 8 + 2; 
 	animal  a = allocate cat();
 	string voice = a.voice.voiceStr;
 	res = 0;

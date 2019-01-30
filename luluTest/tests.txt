@@ -1,0 +1,30 @@
+
+grun Lulu expr -gui
+2 * 4 -6 | 8
+
+grun Lulu expr -gui 
+-a + 6 + b * 2
+
+grun Lulu assign -gui
+(a, b, c) = 2 * 4 - 6
+
+grun Lulu assign -gui
+(a, b, c) = -a + b * c -2 / 7 | 5 * ddd#
+
+grun Lulu loop_stmt -gui
+for int a = 6; a == b ; a = a + 1 {
+if c == C#6 { (A,b) = a * 7 / 6; } }
+
+
+grun Lulu program -gui 
+%% A sample program
+declare{
+    int a;
+    mytype;
+    (int, float) = f1(float b);
+}
+(int r) = function start() {
+    return;
+}
+
+

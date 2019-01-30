@@ -1,0 +1,11 @@
+declare{
+    (int) = fib(bool v, string s);
+}
+
+(float f, float e) = function yechizi(){
+    while e == f == e {
+        const float b, k;
+        int a[12], z[13][17];
+        return;
+    }
+}
